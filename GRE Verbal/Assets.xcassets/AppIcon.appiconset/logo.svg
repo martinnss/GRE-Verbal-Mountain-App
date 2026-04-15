@@ -1,0 +1,56 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D0D1A"/>
+      <stop offset="50%" style="stop-color:#1A1A2E"/>
+      <stop offset="100%" style="stop-color:#16213E"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A2A4A"/>
+      <stop offset="100%" style="stop-color:#1E1E38"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00D4FF"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#E0E0E0"/>
+    </linearGradient>
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="224" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle glow orbs -->
+  <circle cx="200" cy="300" r="200" fill="#00D4FF" opacity="0.08" filter="url(#glow)"/>
+  <circle cx="824" cy="724" r="250" fill="#7C3AED" opacity="0.06" filter="url(#glow)"/>
+  
+  <!-- Back card (offset) -->
+  <rect x="280" y="240" width="480" height="580" rx="40" fill="url(#cardGrad)" opacity="0.5" transform="rotate(-8 520 530)"/>
+  
+  <!-- Middle card -->
+  <rect x="290" y="230" width="480" height="580" rx="40" fill="url(#cardGrad)" opacity="0.7" transform="rotate(-4 530 520)"/>
+  
+  <!-- Front card -->
+  <rect x="300" y="220" width="480" height="580" rx="40" fill="url(#cardGrad)"/>
+  <rect x="300" y="220" width="480" height="580" rx="40" fill="none" stroke="url(#accentGrad)" stroke-width="3" opacity="0.6"/>
+  
+  <!-- Letter "V" on card -->
+  <text x="540" y="580" font-family="Georgia, serif" font-size="320" font-weight="bold" fill="url(#textGrad)" text-anchor="middle">V</text>
+  
+  <!-- Accent line under V -->
+  <rect x="400" y="640" width="280" height="8" rx="4" fill="url(#accentGrad)"/>
+  
+  <!-- Small "GRE" text -->
+  <text x="540" y="720" font-family="SF Pro Display, -apple-system, sans-serif" font-size="56" font-weight="600" fill="#00D4FF" text-anchor="middle" letter-spacing="12">GRE</text>
+</svg>
