@@ -1,0 +1,47 @@
+# Xcode
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/xcshareddata/xcschemes/
+DerivedData/
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+*.xcodeproj/package.resolved
+
+# Cocoapods
+Pods/
+Podfile.lock
+
+# IDE
+.vscode/
+.idea/
+*.swiftpm
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Swift
+.swift-version
+
+# Compiled
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.deb
+*.rpm
+
+# Test artifacts
+xctest
