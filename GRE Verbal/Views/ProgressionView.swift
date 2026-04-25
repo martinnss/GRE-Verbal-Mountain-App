@@ -67,7 +67,7 @@ struct ProgressionView: View {
             HStack {
                 Image(systemName: "externaldrive.fill.badge.checkmark")
                     .font(.title2)
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color(hex: "4ADE80"))
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Backup Progress")
@@ -94,7 +94,7 @@ struct ProgressionView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.cyan.opacity(0.3))
+                    .background(Color(hex: "4ADE80").opacity(0.2))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 
@@ -239,7 +239,7 @@ struct ProgressionView: View {
                         }
                         if includeUnlocked && unlockedPercent > 0 {
                             Rectangle()
-                                .fill(Color.purple.opacity(0.6))
+                                .fill(Color(hex: "C4935A").opacity(0.7))
                                 .frame(width: geo.size.width * unlockedPercent / 100)
                         }
                     }
@@ -259,7 +259,7 @@ struct ProgressionView: View {
                     }
                     if includeUnlocked {
                         HStack(spacing: 16) {
-                            ProgressLegendItem(color: .purple.opacity(0.6), label: "Backlog", percent: unlockedPercent)
+                            ProgressLegendItem(color: Color(hex: "C4935A").opacity(0.7), label: "Backlog", percent: unlockedPercent)
                             Spacer()
                         }
                     }
@@ -279,7 +279,7 @@ struct ProgressionView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
-                .foregroundStyle(includeUnlocked ? .purple : .white.opacity(0.7))
+                .foregroundStyle(includeUnlocked ? Color(hex: "C4935A") : .white.opacity(0.7))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .background(Color.white.opacity(0.08))
@@ -442,7 +442,7 @@ struct GroupProgressRow: View {
                 MiniStatBadge(count: stats.easyMastered, color: .mint, icon: "star.circle.fill")
                 MiniStatBadge(count: stats.medium, color: .orange, icon: "flame.fill")
                 MiniStatBadge(count: stats.hard, color: .red, icon: "bolt.fill")
-                MiniStatBadge(count: stats.unlocked, color: .purple, icon: "sparkles")
+                MiniStatBadge(count: stats.unlocked, color: Color(hex: "C4935A"), icon: "sparkles")
             }
         }
         .padding(14)

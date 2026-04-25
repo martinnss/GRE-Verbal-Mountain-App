@@ -119,10 +119,10 @@ struct WordCard: View {
             if let definition = word.definitions.first {
                 Text(definition.partOfSpeech)
                     .font(.system(size: 9, weight: .medium))
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color(hex: "4ADE80"))
                     .padding(.horizontal, 5)
                     .padding(.vertical, 2)
-                    .background(Color.cyan.opacity(0.15))
+                    .background(Color(hex: "4ADE80").opacity(0.15))
                     .clipShape(Capsule())
                 
                 Text(definition.definition)
@@ -215,10 +215,10 @@ struct DefinitionItemView: View {
             Text(definition.partOfSpeech)
                 .font(.caption)
                 .fontWeight(.medium)
-                .foregroundStyle(.cyan)
+                .foregroundStyle(Color(hex: "4ADE80"))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 2)
-                .background(Color.cyan.opacity(0.15))
+                .background(Color(hex: "4ADE80").opacity(0.15))
                 .clipShape(Capsule())
         }
     }

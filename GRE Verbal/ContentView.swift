@@ -38,25 +38,29 @@ struct ContentView: View {
                         }
                         .tag(2)
                 }
-                .tint(.cyan)
+                .tint(Color(hex: "4ADE80"))
             } else {
                 errorView
             }
         }
         .onAppear {
             setupViewModel()
+            NotificationManager.shared.requestPermission()
+            NotificationManager.shared.refreshOnLaunch(
+                todayCompleted: StreakManager.shared.todayCompleted
+            )
         }
     }
     
     private var loadingView: some View {
         ZStack {
-            Color(hex: "0D0D1A")
+            Color(hex: "060D07")
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
                 ProgressView()
                     .scaleEffect(1.5)
-                    .tint(.cyan)
+                    .tint(Color(hex: "4ADE80"))
                 Text("Loading vocabulary...")
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.6))
@@ -66,7 +70,7 @@ struct ContentView: View {
     
     private var errorView: some View {
         ZStack {
-            Color(hex: "0D0D1A")
+            Color(hex: "060D07")
                 .ignoresSafeArea()
             
             VStack(spacing: 16) {
@@ -80,7 +84,7 @@ struct ContentView: View {
                     setupViewModel()
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.cyan)
+                .tint(Color(hex: "4ADE80"))
             }
         }
     }

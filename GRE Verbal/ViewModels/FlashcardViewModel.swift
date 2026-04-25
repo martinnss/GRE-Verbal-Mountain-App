@@ -131,6 +131,7 @@ final class FlashcardViewModel {
             }
         } else {
             showingSessionComplete = true
+            StreakManager.shared.recordCompletion()
         }
     }
     

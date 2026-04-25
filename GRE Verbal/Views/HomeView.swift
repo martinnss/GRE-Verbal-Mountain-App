@@ -15,6 +15,9 @@ struct HomeView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Streak card
+                        StreakCard(streakManager: .shared)
+
                         // Statistics card
                         statisticsCard
                         
@@ -38,6 +41,7 @@ struct HomeView: View {
                 FlashcardSessionView(viewModel: viewModel, isPresented: $showingFlashcards)
             }
             .onAppear {
+                StreakManager.shared.checkAndResetIfNeeded()
                 if let min = viewModel.selectedGroups.min(), let max = viewModel.selectedGroups.max() {
                     selectedGroupRange = min...max
                 }
@@ -65,7 +69,7 @@ struct HomeView: View {
                     .trim(from: 0, to: CGFloat(masteredPercent) / 100)
                     .stroke(
                         LinearGradient(
-                            colors: [.green, .cyan],
+                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
@@ -94,7 +98,7 @@ struct HomeView: View {
                 HStack(spacing: 0) {
                     Spacer()
                     StatItem(value: stats.hard, label: "Hard", color: .red)
-                    StatItem(value: stats.unlocked, label: "New", color: .purple)
+                    StatItem(value: stats.unlocked, label: "New", color: Color(hex: "C4935A"))
                     Spacer()
                 }
             }
@@ -146,7 +150,7 @@ struct HomeView: View {
                     DifficultyChip(
                         title: "New",
                         icon: "sparkles",
-                        color: .purple,
+                        color: Color(hex: "C4935A"),
                         isSelected: viewModel.selectedDifficulties.contains(.unlocked),
                         onTap: { viewModel.toggleDifficulty(.unlocked) }
                     )
@@ -224,13 +228,13 @@ struct HomeView: View {
             .padding(.vertical, 18)
             .background(
                 LinearGradient(
-                    colors: [Color.blue, Color.purple.opacity(0.8)],
+                    colors: [Color(hex: "22C55E"), Color(hex: "8B5E3C")],
                     startPoint: .leading,
                     endPoint: .trailing
                 )
             )
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: .blue.opacity(0.4), radius: 15, y: 8)
+            .shadow(color: Color(hex: "4ADE80").opacity(0.35), radius: 15, y: 8)
         }
         .disabled(viewModel.selectedGroups.isEmpty || viewModel.selectedDifficulties.isEmpty)
         .opacity(viewModel.selectedGroups.isEmpty || viewModel.selectedDifficulties.isEmpty ? 0.4 : 1)
@@ -372,7 +376,7 @@ struct GroupRangePicker: View {
             HStack(spacing: 1) {
                 ForEach(1...totalGroups, id: \.self) { group in
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(isInRange(group) ? Color.cyan : Color.white.opacity(0.15))
+                        .fill(isInRange(group) ? Color(hex: "4ADE80") : Color.white.opacity(0.15))
                         .frame(height: 6)
                 }
             }
@@ -528,7 +532,7 @@ struct SessionCompleteView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
+                    .background(LinearGradient(colors: [Color(hex: "22C55E"), Color(hex: "8B5E3C")], startPoint: .leading, endPoint: .trailing))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
                 

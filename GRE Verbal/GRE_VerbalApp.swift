@@ -15,7 +15,7 @@ enum SchemaV1: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [WordProgressV1.self, AppSettingsV1.self]
     }
-    
+
     @Model
     final class WordProgressV1 {
         @Attribute(.unique) var word: String
@@ -24,7 +24,7 @@ enum SchemaV1: VersionedSchema {
         var knewOnFirstTry: Bool
         var lastReviewedDate: Date?
         var consecutiveCorrectCount: Int
-        
+
         init(word: String) {
             self.word = word
             self.wrongCount = 0
@@ -34,14 +34,14 @@ enum SchemaV1: VersionedSchema {
             self.consecutiveCorrectCount = 0
         }
     }
-    
+
     @Model
     final class AppSettingsV1 {
         var selectedGroups: [Int]
         var selectedDifficulties: [String]
         var isCumulativeMode: Bool
         var hasCompletedOnboarding: Bool
-        
+
         init() {
             self.selectedGroups = [1]
             self.selectedDifficulties = ["Unlocked", "Easy", "Medium", "Hard"]
@@ -90,65 +90,186 @@ enum MigrationPlan: SchemaMigrationPlan {
 @main
 struct GRE_VerbalApp: App {
     let modelContainer: ModelContainer
-    
+
+    private static let storeFileName = "default.store"
+
     init() {
+        let fileManager = FileManager.default
+        let appSupport = URL.applicationSupportDirectory
+        let defaultStore = appSupport.appending(path: Self.storeFileName)
+
+        try? fileManager.createDirectory(at: appSupport, withIntermediateDirectories: true)
+
+        // If a backup exists but current store is missing, recover automatically.
+        Self.restoreMostRecentBackupIfStoreMissing(
+            fileManager: fileManager,
+            appSupport: appSupport,
+            defaultStore: defaultStore
+        )
+
         do {
-            let schema = Schema([
-                WordProgress.self,
-                AppSettings.self,
-                DrillSession.self
-            ])
-            let modelConfiguration = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                allowsSave: true,
-                cloudKitDatabase: .none
-            )
-            modelContainer = try ModelContainer(
-                for: schema,
-                configurations: [modelConfiguration]
-            )
+            modelContainer = try Self.makeContainer(useMigrationPlan: true)
             print("✅ SwiftData initialized successfully")
         } catch {
-            // Migration failed — backup old store and start fresh
-            print("⚠️ SwiftData migration failed: \(error). Creating new database (old data preserved in backup)...")
+            print("⚠️ SwiftData migration failed: \(error). Preserving old store and rebuilding...")
 
-            let fileManager = FileManager.default
-            let appSupport = URL.applicationSupportDirectory
-            let defaultStore = appSupport.appending(path: "default.store")
+            let backupURL = Self.backupStoreFamilyIfNeeded(
+                fileManager: fileManager,
+                appSupport: appSupport,
+                defaultStore: defaultStore
+            )
 
-            // Create backup of old database if it exists
-            if fileManager.fileExists(atPath: defaultStore.path) {
-                let backupURL = appSupport.appending(path: "backup_\(Date().timeIntervalSince1970).store")
-                try? fileManager.copyItem(at: defaultStore, to: backupURL)
-                print("📦 Old database backed up to: \(backupURL.path)")
-
-                // Remove old store files
-                try? fileManager.removeItem(at: defaultStore)
-                try? fileManager.removeItem(at: defaultStore.appendingPathExtension("wal"))
-                try? fileManager.removeItem(at: defaultStore.appendingPathExtension("shm"))
+            if let backupURL {
+                print("📦 Backed up old database to: \(backupURL.path)")
             }
 
             do {
-                let schema = Schema([
-                    WordProgress.self,
-                    AppSettings.self,
-                    DrillSession.self
-                ])
-                let modelConfiguration = ModelConfiguration(
-                    schema: schema,
-                    isStoredInMemoryOnly: false
-                )
-                modelContainer = try ModelContainer(
-                    for: schema,
-                    configurations: [modelConfiguration]
-                )
+                modelContainer = try Self.makeContainer(useMigrationPlan: false)
+                print("✅ SwiftData initialized with fresh store")
             } catch {
-                fatalError("Could not initialize ModelContainer: \(error)")
+                fatalError("Could not initialize ModelContainer after recovery: \(error)")
             }
         }
     }
-    
+
+    private static func makeContainer(useMigrationPlan: Bool) throws -> ModelContainer {
+        let schema = Schema(
+            [WordProgress.self, AppSettings.self, DrillSession.self],
+            version: SchemaV3.versionIdentifier
+        )
+
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true,
+            cloudKitDatabase: .none
+        )
+
+        if useMigrationPlan {
+            return try ModelContainer(
+                for: schema,
+                migrationPlan: MigrationPlan.self,
+                configurations: [modelConfiguration]
+            )
+        }
+
+        return try ModelContainer(
+            for: schema,
+            configurations: [modelConfiguration]
+        )
+    }
+
+    private static func walURL(for store: URL) -> URL {
+        URL(fileURLWithPath: store.path + "-wal")
+    }
+
+    private static func shmURL(for store: URL) -> URL {
+        URL(fileURLWithPath: store.path + "-shm")
+    }
+
+    private static func backupStoreFamilyIfNeeded(
+        fileManager: FileManager,
+        appSupport: URL,
+        defaultStore: URL
+    ) -> URL? {
+        guard fileManager.fileExists(atPath: defaultStore.path) else {
+            return nil
+        }
+
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let backupStore = appSupport.appending(path: "backup_\(timestamp).store")
+
+        if fileManager.fileExists(atPath: backupStore.path) {
+            try? fileManager.removeItem(at: backupStore)
+        }
+
+        do {
+            try fileManager.moveItem(at: defaultStore, to: backupStore)
+        } catch {
+            do {
+                try fileManager.copyItem(at: defaultStore, to: backupStore)
+                try? fileManager.removeItem(at: defaultStore)
+            } catch {
+                return nil
+            }
+        }
+
+        moveSidecarIfExists(
+            fileManager: fileManager,
+            from: walURL(for: defaultStore),
+            to: walURL(for: backupStore)
+        )
+        moveSidecarIfExists(
+            fileManager: fileManager,
+            from: shmURL(for: defaultStore),
+            to: shmURL(for: backupStore)
+        )
+
+        return backupStore
+    }
+
+    private static func moveSidecarIfExists(fileManager: FileManager, from: URL, to: URL) {
+        guard fileManager.fileExists(atPath: from.path) else { return }
+        try? fileManager.removeItem(at: to)
+
+        do {
+            try fileManager.moveItem(at: from, to: to)
+        } catch {
+            do {
+                try fileManager.copyItem(at: from, to: to)
+                try? fileManager.removeItem(at: from)
+            } catch {
+                // Best effort only
+            }
+        }
+    }
+
+    private static func restoreMostRecentBackupIfStoreMissing(
+        fileManager: FileManager,
+        appSupport: URL,
+        defaultStore: URL
+    ) {
+        guard !fileManager.fileExists(atPath: defaultStore.path) else { return }
+        guard let backupStore = latestBackupStore(fileManager: fileManager, appSupport: appSupport) else { return }
+
+        do {
+            try fileManager.copyItem(at: backupStore, to: defaultStore)
+            copySidecarIfExists(
+                fileManager: fileManager,
+                from: walURL(for: backupStore),
+                to: walURL(for: defaultStore)
+            )
+            copySidecarIfExists(
+                fileManager: fileManager,
+                from: shmURL(for: backupStore),
+                to: shmURL(for: defaultStore)
+            )
+            print("🔄 Restored store from backup: \(backupStore.lastPathComponent)")
+        } catch {
+            print("⚠️ Failed to restore backup store: \(error)")
+        }
+    }
+
+    private static func copySidecarIfExists(fileManager: FileManager, from: URL, to: URL) {
+        guard fileManager.fileExists(atPath: from.path) else { return }
+        try? fileManager.removeItem(at: to)
+        try? fileManager.copyItem(at: from, to: to)
+    }
+
+    private static func latestBackupStore(fileManager: FileManager, appSupport: URL) -> URL? {
+        let contents = (try? fileManager.contentsOfDirectory(at: appSupport, includingPropertiesForKeys: [.contentModificationDateKey])) ?? []
+
+        let backups = contents.filter {
+            $0.lastPathComponent.hasPrefix("backup_") && $0.pathExtension == "store"
+        }
+
+        return backups.sorted { lhs, rhs in
+            let l = (try? lhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            let r = (try? rhs.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            return l > r
+        }.first
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -75,7 +75,7 @@ struct FlashcardView: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(
                             LinearGradient(
-                                colors: [.cyan, .blue],
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
@@ -149,7 +149,7 @@ struct FlashcardView: View {
                 Button(action: { viewModel.playCurrentWordAudio() }) {
                     Image(systemName: viewModel.audioManager.isPlaying ? "speaker.wave.3.fill" : "speaker.wave.2.fill")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color(hex: "4ADE80"))
                         .frame(width: 50, height: 50)
                         .background(Color.white.opacity(0.1))
                         .clipShape(Circle())
@@ -307,10 +307,10 @@ struct CardView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
-                .foregroundStyle(.cyan)
+                .foregroundStyle(Color(hex: "4ADE80"))
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
-                .background(Color.cyan.opacity(0.15))
+                .background(Color(hex: "4ADE80").opacity(0.15))
                 .clipShape(Capsule())
             }
             
@@ -353,9 +353,9 @@ struct CardView: View {
                     Button(action: onAudio) {
                         Image(systemName: isPlaying ? "speaker.wave.3.fill" : "speaker.wave.2.fill")
                             .font(.title3)
-                            .foregroundStyle(.cyan)
+                            .foregroundStyle(Color(hex: "4ADE80"))
                             .frame(width: 42, height: 42)
-                            .background(Color.cyan.opacity(0.15))
+                            .background(Color(hex: "4ADE80").opacity(0.15))
                             .clipShape(Circle())
                     }
                 }
@@ -394,7 +394,7 @@ struct CardView: View {
     
     private var tierColor: Color {
         switch tier {
-        case .unlocked: return .purple
+        case .unlocked: return Color(hex: "C4935A")
         case .easyNatural: return .green
         case .easyMastered: return .mint
         case .medium: return .orange
@@ -423,7 +423,7 @@ struct DefinitionCard: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color.blue)
+                    .background(Color(hex: "22C55E"))
                     .clipShape(Capsule())
             }
             
@@ -466,10 +466,10 @@ struct DefinitionCard: View {
                             Text(syn)
                                 .font(.caption)
                                 .fontWeight(.medium)
-                                .foregroundStyle(.cyan)
+                                .foregroundStyle(Color(hex: "4ADE80"))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
-                                .background(Color.cyan.opacity(0.15))
+                                .background(Color(hex: "4ADE80").opacity(0.15))
                                 .clipShape(Capsule())
                         }
                     }
@@ -529,7 +529,7 @@ struct FlowLayout: Layout {
     viewModel.buildDeck()
     
     return ZStack {
-        Color(hex: "0D0D1A").ignoresSafeArea()
+        Color(hex: "060D07").ignoresSafeArea()
         FlashcardView(viewModel: viewModel)
     }
     .preferredColorScheme(.dark)

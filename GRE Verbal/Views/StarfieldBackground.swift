@@ -3,14 +3,18 @@ import SwiftUI
 // MARK: - Starfield Background
 
 struct StarfieldBackground: View {
+    var showAnimatedStars: Bool = true
+    var starCount: Int = 180
+    var frameRate: Double = 30
+
     var body: some View {
         ZStack {
-            // Base dark gradient
+            // Base dark gradient — very dark forest green-black
             LinearGradient(
                 colors: [
-                    Color(hex: "05050F"),
-                    Color(hex: "0A0A1A"),
-                    Color(hex: "0F0F25")
+                    Color(hex: "030806"),
+                    Color(hex: "060D07"),
+                    Color(hex: "080F09")
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -18,36 +22,39 @@ struct StarfieldBackground: View {
             .ignoresSafeArea()
             
             // Starfield
-            StarfieldView()
-                .ignoresSafeArea()
+            if showAnimatedStars {
+                StarfieldView(starCount: starCount, frameRate: frameRate)
+                    .ignoresSafeArea()
+            }
             
-            // Subtle purple nebula glow (smaller)
+            // Green nebula glow (top-left)
             GeometryReader { geo in
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color.purple.opacity(0.12), Color.clear],
+                            colors: [Color(hex: "0A3D1A").opacity(0.35), Color.clear],
                             center: .center,
                             startRadius: 0,
-                            endRadius: 120
+                            endRadius: 130
                         )
                     )
-                    .frame(width: 250, height: 250)
-                    .offset(x: -80, y: geo.size.height * 0.2)
-                    .blur(radius: 40)
+                    .frame(width: 260, height: 260)
+                    .offset(x: -90, y: geo.size.height * 0.18)
+                    .blur(radius: 45)
                 
+                // Bronze nebula glow (bottom-right)
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "4A0080").opacity(0.1), Color.clear],
+                            colors: [Color(hex: "3D1F0A").opacity(0.28), Color.clear],
                             center: .center,
                             startRadius: 0,
-                            endRadius: 150
+                            endRadius: 160
                         )
                     )
-                    .frame(width: 300, height: 300)
-                    .offset(x: geo.size.width - 150, y: geo.size.height * 0.6)
-                    .blur(radius: 50)
+                    .frame(width: 320, height: 320)
+                    .offset(x: geo.size.width - 140, y: geo.size.height * 0.58)
+                    .blur(radius: 55)
             }
         }
     }
@@ -56,11 +63,17 @@ struct StarfieldBackground: View {
 // MARK: - Starfield View
 
 struct StarfieldView: View {
-    @State private var stars: [Star] = Star.generateStars(count: 300)
+    let frameRate: Double
+    @State private var stars: [Star]
+
+    init(starCount: Int = 180, frameRate: Double = 30) {
+        self.frameRate = frameRate
+        _stars = State(initialValue: Star.generateStars(count: starCount))
+    }
     
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1/60)) { timeline in
-            Canvas { context, size in
+        TimelineView(.animation(minimumInterval: 1.0 / max(1.0, frameRate))) { timeline in
+            Canvas(opaque: false, colorMode: .linear, rendersAsynchronously: true) { context, size in
                 let time = timeline.date.timeIntervalSinceReferenceDate
                 
                 for star in stars {
@@ -110,14 +123,14 @@ struct Star: Identifiable {
     let twinklePhase: Double
     let colorIndex: Int
     
-    // Purple-tinted star colors
+    // Green-tinted star colors with occasional bronze accent
     var color: Color {
         switch colorIndex {
-        case 0: return Color(hex: "F0E6FF") // Bright white-purple
-        case 1: return Color(hex: "D4B8FF") // Soft lavender
-        case 2: return Color(hex: "B57EFF") // Medium purple
-        case 3: return Color(hex: "9945FF") // Vibrant purple
-        default: return Color(hex: "7C3AED") // Deep purple
+        case 0: return Color(hex: "E8FAF0") // Bright white-green
+        case 1: return Color(hex: "A8E6BA") // Soft green
+        case 2: return Color(hex: "4ADE80") // Vivid emerald
+        case 3: return Color(hex: "22C55E") // Medium green
+        default: return Color(hex: "C4935A") // Bronze accent
         }
     }
     

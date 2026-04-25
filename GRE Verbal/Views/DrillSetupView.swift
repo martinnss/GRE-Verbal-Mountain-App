@@ -5,10 +5,11 @@ struct DrillSetupView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var vm = DrillTimerViewModel()
     @Query(sort: \DrillSession.date, order: .reverse) private var history: [DrillSession]
+    @State private var selectedSession: DrillSession? = nil
 
     var body: some View {
         ZStack {
-            Color(hex: "0D0D1A").ignoresSafeArea()
+            Color(hex: "060D07").ignoresSafeArea()
             StarfieldBackground()
 
             ScrollView {
@@ -28,6 +29,9 @@ struct DrillSetupView: View {
             set: { if !$0 { vm.resetDrill() } }
         )) {
             DrillActiveView(vm: vm)
+        }
+        .sheet(item: $selectedSession) { session in
+            DrillDetailView(session: session)
         }
         .onAppear {
             vm.configure(modelContext: modelContext)
@@ -63,7 +67,7 @@ struct DrillSetupView: View {
                     Button { if vm.questionCount > 1 { vm.questionCount -= 1 } } label: {
                         Image(systemName: "minus.circle.fill")
                             .font(.title2)
-                            .foregroundStyle(.cyan.opacity(0.8))
+                            .foregroundStyle(Color(hex: "4ADE80").opacity(0.8))
                     }
                     Spacer()
                     Text("\(vm.questionCount)")
@@ -75,7 +79,7 @@ struct DrillSetupView: View {
                     Button { vm.questionCount += 1 } label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.title2)
-                            .foregroundStyle(.cyan.opacity(0.8))
+                            .foregroundStyle(Color(hex: "4ADE80").opacity(0.8))
                     }
                 }
             }
@@ -95,7 +99,7 @@ struct DrillSetupView: View {
                     } label: {
                         Image(systemName: "minus.circle.fill")
                             .font(.title2)
-                            .foregroundStyle(.cyan.opacity(0.8))
+                            .foregroundStyle(Color(hex: "4ADE80").opacity(0.8))
                     }
                     Spacer()
                     Text(minutesLabel)
@@ -107,7 +111,7 @@ struct DrillSetupView: View {
                     Button { vm.secondsPerQuestion += 10 } label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.title2)
-                            .foregroundStyle(.cyan.opacity(0.8))
+                            .foregroundStyle(Color(hex: "4ADE80").opacity(0.8))
                     }
                 }
             }
@@ -138,13 +142,13 @@ struct DrillSetupView: View {
                     .padding(.vertical, 16)
                     .background(
                         LinearGradient(
-                            colors: [.cyan, Color(hex: "00BFFF")],
+                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .shadow(color: .cyan.opacity(0.4), radius: 10, y: 4)
+                    .shadow(color: Color(hex: "4ADE80").opacity(0.4), radius: 10, y: 4)
             }
         }
         .padding(20)
@@ -167,6 +171,9 @@ struct DrillSetupView: View {
 
             ForEach(history) { session in
                 DrillHistoryRow(session: session)
+                    .onTapGesture {
+                        selectedSession = session
+                    }
                     .contextMenu {
                         Button(role: .destructive) {
                             modelContext.delete(session)
@@ -216,7 +223,10 @@ struct DrillHistoryRow: View {
                 Spacer()
                 Text("\(session.questionCount) Qs")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color(hex: "4ADE80"))
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.3))
             }
 
             HStack(spacing: 0) {
@@ -229,13 +239,13 @@ struct DrillHistoryRow: View {
                 statCell(
                     label: "Avg/Q",
                     value: DrillTimerViewModel.format(seconds: session.avgTimePerQuestion),
-                    color: .cyan
+                    color: Color(hex: "4ADE80")
                 )
                 Divider().background(.white.opacity(0.15)).frame(height: 30)
                 statCell(
                     label: "Errors",
-                    value: "\(session.wrongQuestions.count)",
-                    color: session.wrongQuestions.isEmpty ? .green : .red
+                    value: "\(session.displayWrongCount)",
+                    color: session.displayWrongCount == 0 ? .green : .red
                 )
                 Divider().background(.white.opacity(0.15)).frame(height: 30)
                 statCell(

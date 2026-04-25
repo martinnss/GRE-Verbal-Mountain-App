@@ -8,11 +8,12 @@ struct DrillActiveView: View {
     @State private var showResetAlert = false
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 5)
+    private let currentQuestionAccent = Color(hex: "C4935A")
 
     var body: some View {
         ZStack {
-            Color(hex: "0D0D1A").ignoresSafeArea()
-            StarfieldBackground()
+            Color(hex: "060D07").ignoresSafeArea()
+            StarfieldBackground(showAnimatedStars: false)
 
             VStack(spacing: 0) {
                 // Top ~33%: Dual clock panel
@@ -89,7 +90,7 @@ struct DrillActiveView: View {
         VStack(spacing: 12) {
             Image(systemName: "hand.tap.fill")
                 .font(.system(size: 40))
-                .foregroundStyle(.cyan.opacity(0.8))
+                .foregroundStyle(Color(hex: "4ADE80").opacity(0.8))
             Text("TAP TO START")
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
@@ -97,7 +98,7 @@ struct DrillActiveView: View {
             Text("\(vm.questionCount) questions · \(minutesLabel) each")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.5))
-            Text("tap = correct  ·  double-tap = wrong")
+            Text("tap current = ✓  ·  tap other = navigate  ·  double-tap = ✗")
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.3))
                 .kerning(0.5)
@@ -108,7 +109,7 @@ struct DrillActiveView: View {
         VStack(spacing: 10) {
             Image(systemName: "pause.circle.fill")
                 .font(.system(size: 40))
-                .foregroundStyle(.cyan.opacity(0.8))
+                .foregroundStyle(Color(hex: "4ADE80").opacity(0.8))
             Text("PAUSED")
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
@@ -145,7 +146,7 @@ struct DrillActiveView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.45))
                     .kerning(2)
-                Text(DrillTimerViewModel.format(seconds: vm.questionElapsed))
+                Text(DrillTimerViewModel.format(seconds: vm.currentQuestionElapsed))
                     .font(.system(size: 46, weight: .bold, design: .monospaced))
                     .foregroundStyle(questionTimerColor)
                     .monospacedDigit()
@@ -156,9 +157,9 @@ struct DrillActiveView: View {
 
     private var questionTimerColor: Color {
         let estimate = vm.secondsPerQuestion
-        guard estimate > 0 else { return .cyan }
-        let ratio = vm.questionElapsed / estimate
-        if ratio < 0.75 { return .cyan }
+        guard estimate > 0 else { return Color(hex: "4ADE80") }
+        let ratio = vm.currentQuestionElapsed / estimate
+        if ratio < 0.75 { return Color(hex: "4ADE80") }
         if ratio < 1.0  { return .orange }
         return .red
     }
@@ -182,7 +183,7 @@ struct DrillActiveView: View {
             let current = min(vm.currentQuestion, vm.questionCount)
             Text("Q \(current) / \(vm.questionCount)")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.cyan.opacity(0.8))
+                .foregroundStyle(currentQuestionAccent.opacity(0.85))
 
             Spacer()
 
@@ -224,32 +225,32 @@ struct DrillActiveView: View {
             let state = vm.questionStates[idx]
             let isCurrent = number == vm.currentQuestion && vm.started
 
-        ZStack {
-            Circle()
-                .fill(circleFill(state: state, isCurrent: isCurrent))
-                .overlay(
-                    Circle()
-                        .strokeBorder(circleBorder(state: state, isCurrent: isCurrent), lineWidth: isCurrent ? 2.5 : 1.5)
-                )
-                .shadow(color: circleShadow(state: state, isCurrent: isCurrent), radius: isCurrent ? 10 : 4)
+            ZStack {
+                Circle()
+                    .fill(circleFill(state: state, isCurrent: isCurrent))
+                    .overlay(
+                        Circle()
+                            .strokeBorder(circleBorder(state: state, isCurrent: isCurrent), lineWidth: isCurrent ? 2.5 : 1.5)
+                    )
+                    .shadow(color: circleShadow(state: state, isCurrent: isCurrent), radius: isCurrent ? 10 : 4)
 
-            Text("\(number)")
-                .font(.system(size: circleFont(count: vm.questionCount), weight: .bold, design: .rounded))
-                .foregroundStyle(circleTextColor(state: state, isCurrent: isCurrent))
-        }
-        .frame(width: circleSize(count: vm.questionCount), height: circleSize(count: vm.questionCount))
-        .scaleEffect(isCurrent ? 1.1 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCurrent)
-        .onTapGesture(count: 2) {
-            if state == .pending && vm.started {
-                vm.longPressQuestion(number)
+                Text("\(number)")
+                    .font(.system(size: circleFont(count: vm.questionCount), weight: .bold, design: .rounded))
+                    .foregroundStyle(circleTextColor(state: state, isCurrent: isCurrent))
             }
-        }
-        .onTapGesture(count: 1) {
-            if state == .pending && vm.started {
-                vm.tapQuestion(number)
+            .frame(width: circleSize(count: vm.questionCount), height: circleSize(count: vm.questionCount))
+            .scaleEffect(isCurrent ? 1.1 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCurrent)
+            .onTapGesture(count: 2) {
+                if vm.started {
+                    vm.longPressQuestion(number)
+                }
             }
-        }
+            .onTapGesture(count: 1) {
+                if state == .pending && vm.started {
+                    vm.tapQuestion(number)
+                }
+            }
         } // end bounds guard
     }
 
@@ -265,7 +266,7 @@ struct DrillActiveView: View {
 
     private func circleFill(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? Color.cyan.opacity(0.15) : Color.white.opacity(0.05)
+        case .pending: return isCurrent ? currentQuestionAccent.opacity(0.18) : Color.white.opacity(0.05)
         case .correct: return Color.green.opacity(0.25)
         case .wrong:   return Color.red.opacity(0.25)
         }
@@ -273,7 +274,7 @@ struct DrillActiveView: View {
 
     private func circleBorder(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? .cyan : .white.opacity(0.25)
+        case .pending: return isCurrent ? currentQuestionAccent : .white.opacity(0.25)
         case .correct: return .green.opacity(0.7)
         case .wrong:   return .red.opacity(0.7)
         }
@@ -281,7 +282,7 @@ struct DrillActiveView: View {
 
     private func circleShadow(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? .cyan.opacity(0.5) : .clear
+        case .pending: return isCurrent ? currentQuestionAccent.opacity(0.45) : .clear
         case .correct: return .green.opacity(0.3)
         case .wrong:   return .red.opacity(0.3)
         }
@@ -289,7 +290,7 @@ struct DrillActiveView: View {
 
     private func circleTextColor(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? .cyan : .white.opacity(0.7)
+        case .pending: return isCurrent ? currentQuestionAccent : .white.opacity(0.7)
         case .correct: return .green
         case .wrong:   return .red
         }
@@ -328,7 +329,7 @@ struct DrillActiveView: View {
                         .padding(.vertical, 14)
                         .background(
                             vm.paused
-                            ? AnyShapeStyle(LinearGradient(colors: [.cyan, Color(hex: "00BFFF")], startPoint: .leading, endPoint: .trailing))
+                            ? AnyShapeStyle(LinearGradient(colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")], startPoint: .leading, endPoint: .trailing))
                             : AnyShapeStyle(Color.white.opacity(0.08))
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -349,13 +350,13 @@ struct DrillActiveView: View {
                     .padding(.vertical, 14)
                     .background(
                         LinearGradient(
-                            colors: [.cyan, Color(hex: "00BFFF")],
+                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .shadow(color: .cyan.opacity(0.3), radius: 8, y: 3)
+                    .shadow(color: Color(hex: "4ADE80").opacity(0.3), radius: 8, y: 3)
             }
         }
     }
@@ -365,7 +366,8 @@ struct DrillActiveView: View {
     private var minutesLabel: String {
         let s = Int(vm.secondsPerQuestion)
         if s < 60 { return "\(s)s" }
-        let m = s / 60; let r = s % 60
+        let m = s / 60
+        let r = s % 60
         return r == 0 ? "\(m)m" : "\(m)m \(r)s"
     }
 }

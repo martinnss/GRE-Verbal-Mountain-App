@@ -81,6 +81,7 @@ struct ProgressExportData: Codable {
 final class ProgressManager {
     private var modelContext: ModelContext?
     private var progressCache: [String: WordProgress] = [:]
+    private let autoBackupFileName = "progress_autobackup.json"
     
     func configure(with modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -93,7 +94,16 @@ final class ProgressManager {
         let descriptor = FetchDescriptor<WordProgress>()
         if let results = try? context.fetch(descriptor) {
             progressCache = Dictionary(uniqueKeysWithValues: results.map { ($0.word, $0) })
-            print("✅ Loaded progress for \(results.count) words")
+
+            // Safety net: if the store is empty but we have an auto-backup file, restore it.
+            if results.isEmpty {
+                restoreFromAutoBackupIfNeeded()
+                if let restored = try? context.fetch(descriptor) {
+                    progressCache = Dictionary(uniqueKeysWithValues: restored.map { ($0.word, $0) })
+                }
+            }
+
+            print("✅ Loaded progress for \(progressCache.count) words")
         }
     }
     
@@ -126,7 +136,59 @@ final class ProgressManager {
     }
     
     private func saveContext() {
-        try? modelContext?.save()
+        do {
+            try modelContext?.save()
+            writeAutoBackup()
+        } catch {
+            print("⚠️ Failed to save progress context: \(error)")
+        }
+    }
+
+    private func autoBackupURL() -> URL {
+        URL.applicationSupportDirectory.appending(path: autoBackupFileName)
+    }
+
+    private func writeAutoBackup() {
+        let studied = exportProgress()
+        guard !studied.isEmpty else { return }
+
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let data = try encoder.encode(studied)
+            try data.write(to: autoBackupURL(), options: .atomic)
+        } catch {
+            print("⚠️ Failed to write progress auto-backup: \(error)")
+        }
+    }
+
+    private func restoreFromAutoBackupIfNeeded() {
+        guard let context = modelContext else { return }
+
+        let url = autoBackupURL()
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let backup = try decoder.decode([ProgressExportData].self, from: data)
+            guard !backup.isEmpty else { return }
+
+            for item in backup {
+                let progress = getProgress(for: item.word)
+                progress.wrongCount = item.wrongCount
+                progress.hasSeenOnce = item.hasSeenOnce
+                progress.knewOnFirstTry = item.knewOnFirstTry
+                progress.wasPromotedToEasy = item.wasPromotedToEasy
+                progress.consecutiveCorrectCount = item.consecutiveCorrectCount
+                progress.lastReviewedDate = item.lastReviewedDate
+            }
+
+            try context.save()
+            print("♻️ Restored progress from auto-backup (\(backup.count) words)")
+        } catch {
+            print("⚠️ Failed to restore from auto-backup: \(error)")
+        }
     }
     
     // Filter words by difficulty tiers
@@ -173,7 +235,7 @@ final class ProgressManager {
     }
     
     func importProgress(_ data: [ProgressExportData]) {
-        guard let context = modelContext else { return }
+        guard modelContext != nil else { return }
         
         for item in data {
             let progress = getProgress(for: item.word)
