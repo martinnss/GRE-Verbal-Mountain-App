@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AA04000000000000000000A1 /* GREScreenTimeMonitor.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA01000000000000000000A1 /* GREScreenTimeMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA04000000000000000000A2 /* GREShieldConfig.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA02000000000000000000A1 /* GREShieldConfig.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA04000000000000000000A3 /* GREShieldAction.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA03000000000000000000A1 /* GREShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C6CBC2B12F23D00C003D53C0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +27,55 @@
 			remoteGlobalIDString = C6CBC2A22F23D00B003D53C0;
 			remoteInfo = "GRE Verbal";
 		};
+
+		AA05000000000000000000A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C6CBC29B2F23D00B003D53C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0C000000000000000000A1;
+			remoteInfo = GREScreenTimeMonitor;
+		};
+		AA05000000000000000000A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C6CBC29B2F23D00B003D53C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0C000000000000000000A2;
+			remoteInfo = GREShieldConfig;
+		};
+		AA05000000000000000000A3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C6CBC29B2F23D00B003D53C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0C000000000000000000A3;
+			remoteInfo = GREShieldAction;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		C6CBC2A32F23D00B003D53C0 /* GRE Verbal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GRE Verbal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6CBC2B02F23D00C003D53C0 /* GRE VerbalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GRE VerbalTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6CBC2BA2F23D00C003D53C0 /* GRE VerbalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GRE VerbalUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+
+		AA01000000000000000000A1 /* GREScreenTimeMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GREScreenTimeMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA02000000000000000000A1 /* GREShieldConfig.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GREShieldConfig.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA03000000000000000000A1 /* GREShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GREShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA08000000000000000000A1 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AA04000000000000000000A1 /* GREScreenTimeMonitor.appex in Embed App Extensions */,
+				AA04000000000000000000A2 /* GREShieldConfig.appex in Embed App Extensions */,
+				AA04000000000000000000A3 /* GREShieldAction.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C6CBC2A52F23D00B003D53C0 /* GRE Verbal */ = {
@@ -45,7 +93,59 @@
 			path = "GRE VerbalUITests";
 			sourceTree = "<group>";
 		};
+
+		AA07000000000000000000A1 /* GREScreenTimeMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA11000000000000000000A1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = GREScreenTimeMonitor;
+			sourceTree = "<group>";
+		};
+		AA07000000000000000000A2 /* GREShieldConfig */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA11000000000000000000A2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = GREShieldConfig;
+			sourceTree = "<group>";
+		};
+		AA07000000000000000000A3 /* GREShieldAction */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA11000000000000000000A3 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = GREShieldAction;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA11000000000000000000A1 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info.plist",
+				"GREScreenTimeMonitor.entitlements",
+			);
+			target = AA0C000000000000000000A1 /* GREScreenTimeMonitor */;
+		};
+		AA11000000000000000000A2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info.plist",
+				"GREShieldConfig.entitlements",
+			);
+			target = AA0C000000000000000000A2 /* GREShieldConfig */;
+		};
+		AA11000000000000000000A3 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info.plist",
+				"GREShieldAction.entitlements",
+			);
+			target = AA0C000000000000000000A3 /* GREShieldAction */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		C6CBC2A02F23D00B003D53C0 /* Frameworks */ = {
@@ -63,6 +163,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C6CBC2B72F23D00C003D53C0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		AA09000000000000000000A2 /* Frameworks (GREScreenTimeMonitor) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0A000000000000000000A2 /* Frameworks (GREShieldConfig) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0B000000000000000000A2 /* Frameworks (GREShieldAction) */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -88,6 +210,9 @@
 				C6CBC2A32F23D00B003D53C0 /* GRE Verbal.app */,
 				C6CBC2B02F23D00C003D53C0 /* GRE VerbalTests.xctest */,
 				C6CBC2BA2F23D00C003D53C0 /* GRE VerbalUITests.xctest */,
+				AA01000000000000000000A1 /* GREScreenTimeMonitor.appex */,
+				AA02000000000000000000A1 /* GREShieldConfig.appex */,
+				AA03000000000000000000A1 /* GREShieldAction.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,10 +227,14 @@
 				C6CBC29F2F23D00B003D53C0 /* Sources */,
 				C6CBC2A02F23D00B003D53C0 /* Frameworks */,
 				C6CBC2A12F23D00B003D53C0 /* Resources */,
+				AA08000000000000000000A1 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AA06000000000000000000A1 /* PBXTargetDependency */,
+				AA06000000000000000000A2 /* PBXTargetDependency */,
+				AA06000000000000000000A3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C6CBC2A52F23D00B003D53C0 /* GRE Verbal */,
@@ -163,6 +292,73 @@
 			productReference = C6CBC2BA2F23D00C003D53C0 /* GRE VerbalUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+
+		AA0C000000000000000000A1 /* GREScreenTimeMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0E000000000000000000A1 /* Build configuration list for PBXNativeTarget "GREScreenTimeMonitor" */;
+			buildPhases = (
+				AA09000000000000000000A1 /* Sources */,
+				AA09000000000000000000A2 /* Frameworks */,
+				AA09000000000000000000A3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA07000000000000000000A1 /* GREScreenTimeMonitor */,
+			);
+			name = GREScreenTimeMonitor;
+			packageProductDependencies = (
+			);
+			productName = GREScreenTimeMonitor;
+			productReference = AA01000000000000000000A1 /* GREScreenTimeMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AA0C000000000000000000A2 /* GREShieldConfig */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0E000000000000000000A2 /* Build configuration list for PBXNativeTarget "GREShieldConfig" */;
+			buildPhases = (
+				AA0A000000000000000000A1 /* Sources */,
+				AA0A000000000000000000A2 /* Frameworks */,
+				AA0A000000000000000000A3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA07000000000000000000A2 /* GREShieldConfig */,
+			);
+			name = GREShieldConfig;
+			packageProductDependencies = (
+			);
+			productName = GREShieldConfig;
+			productReference = AA02000000000000000000A1 /* GREShieldConfig.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AA0C000000000000000000A3 /* GREShieldAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0E000000000000000000A3 /* Build configuration list for PBXNativeTarget "GREShieldAction" */;
+			buildPhases = (
+				AA0B000000000000000000A1 /* Sources */,
+				AA0B000000000000000000A2 /* Frameworks */,
+				AA0B000000000000000000A3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA07000000000000000000A3 /* GREShieldAction */,
+			);
+			name = GREShieldAction;
+			packageProductDependencies = (
+			);
+			productName = GREShieldAction;
+			productReference = AA03000000000000000000A1 /* GREShieldAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -203,6 +399,9 @@
 				C6CBC2A22F23D00B003D53C0 /* GRE Verbal */,
 				C6CBC2AF2F23D00C003D53C0 /* GRE VerbalTests */,
 				C6CBC2B92F23D00C003D53C0 /* GRE VerbalUITests */,
+				AA0C000000000000000000A1 /* GREScreenTimeMonitor */,
+				AA0C000000000000000000A2 /* GREShieldConfig */,
+				AA0C000000000000000000A3 /* GREShieldAction */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +422,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C6CBC2B82F23D00C003D53C0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		AA09000000000000000000A3 /* Resources (GREScreenTimeMonitor) */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0A000000000000000000A3 /* Resources (GREShieldConfig) */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0B000000000000000000A3 /* Resources (GREShieldAction) */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +474,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+
+		AA09000000000000000000A1 /* Sources (GREScreenTimeMonitor) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0A000000000000000000A1 /* Sources (GREShieldConfig) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0B000000000000000000A1 /* Sources (GREShieldAction) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +508,22 @@
 			isa = PBXTargetDependency;
 			target = C6CBC2A22F23D00B003D53C0 /* GRE Verbal */;
 			targetProxy = C6CBC2BB2F23D00C003D53C0 /* PBXContainerItemProxy */;
+		};
+
+		AA06000000000000000000A1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0C000000000000000000A1 /* GREScreenTimeMonitor */;
+			targetProxy = AA05000000000000000000A1 /* PBXContainerItemProxy */;
+		};
+		AA06000000000000000000A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0C000000000000000000A2 /* GREShieldConfig */;
+			targetProxy = AA05000000000000000000A2 /* PBXContainerItemProxy */;
+		};
+		AA06000000000000000000A3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0C000000000000000000A3 /* GREShieldAction */;
+			targetProxy = AA05000000000000000000A3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,6 +654,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GRE Verbal/GRE Verbal.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WMWM33Z53V;
@@ -427,6 +687,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GRE Verbal/GRE Verbal.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WMWM33Z53V;
@@ -538,6 +799,163 @@
 			};
 			name = Release;
 		};
+
+		AA0D000000000000000000A1 /* Debug (GREScreenTimeMonitor) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GREScreenTimeMonitor/GREScreenTimeMonitor.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WMWM33Z53V;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "GREScreenTimeMonitor/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "molivares.GRE-Verbal.GREScreenTimeMonitor";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA0D000000000000000000A2 /* Release (GREScreenTimeMonitor) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GREScreenTimeMonitor/GREScreenTimeMonitor.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WMWM33Z53V;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "GREScreenTimeMonitor/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "molivares.GRE-Verbal.GREScreenTimeMonitor";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AA0D000000000000000000A3 /* Debug (GREShieldConfig) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GREShieldConfig/GREShieldConfig.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WMWM33Z53V;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "GREShieldConfig/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "molivares.GRE-Verbal.GREShieldConfig";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA0D000000000000000000A4 /* Release (GREShieldConfig) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GREShieldConfig/GREShieldConfig.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WMWM33Z53V;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "GREShieldConfig/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "molivares.GRE-Verbal.GREShieldConfig";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AA0D000000000000000000A5 /* Debug (GREShieldAction) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GREShieldAction/GREShieldAction.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WMWM33Z53V;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "GREShieldAction/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "molivares.GRE-Verbal.GREShieldAction";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA0D000000000000000000A6 /* Release (GREShieldAction) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GREShieldAction/GREShieldAction.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WMWM33Z53V;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "GREShieldAction/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "molivares.GRE-Verbal.GREShieldAction";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -573,6 +991,34 @@
 			buildConfigurations = (
 				C6CBC2CB2F23D00C003D53C0 /* Debug */,
 				C6CBC2CC2F23D00C003D53C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+
+		AA0E000000000000000000A1 /* Build configuration list for PBXNativeTarget "GREScreenTimeMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0D000000000000000000A1 /* Debug */,
+				AA0D000000000000000000A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0E000000000000000000A2 /* Build configuration list for PBXNativeTarget "GREShieldConfig" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0D000000000000000000A3 /* Debug */,
+				AA0D000000000000000000A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0E000000000000000000A3 /* Build configuration list for PBXNativeTarget "GREShieldAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0D000000000000000000A5 /* Debug */,
+				AA0D000000000000000000A6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

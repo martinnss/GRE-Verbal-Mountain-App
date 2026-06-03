@@ -56,22 +56,59 @@ enum SchemaV2: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [WordProgress.self, AppSettings.self]
     }
+
+    // Frozen WordProgress shape for schema v2 and v3 (before `masteredDate` was
+    // added in v4). It is named `WordProgress` (not WordProgressV2) on purpose:
+    // SwiftData derives the entity name from the unqualified class name, and the
+    // existing on-disk v2/v3 store was written with the live `WordProgress`
+    // entity. Keeping the name identical means v3 -> v4 is a same-entity column
+    // add, not an entity rename (which would drop the user's rows).
+    @Model
+    final class WordProgress {
+        @Attribute(.unique) var word: String
+        var wrongCount: Int
+        var hasSeenOnce: Bool
+        var knewOnFirstTry: Bool
+        @Attribute var wasPromotedToEasy: Bool = false
+        var lastReviewedDate: Date?
+        var consecutiveCorrectCount: Int
+
+        init(word: String) {
+            self.word = word
+            self.wrongCount = 0
+            self.hasSeenOnce = false
+            self.knewOnFirstTry = false
+            self.wasPromotedToEasy = false
+            self.lastReviewedDate = nil
+            self.consecutiveCorrectCount = 0
+        }
+    }
 }
 
 enum SchemaV3: VersionedSchema {
     static var versionIdentifier = Schema.Version(3, 0, 0)
     static var models: [any PersistentModel.Type] {
+        // WordProgress was unchanged from v2 to v3 (v3 only added DrillSession),
+        // so reuse the same frozen shape (entity name "WordProgress").
+        [SchemaV2.WordProgress.self, AppSettings.self, DrillSession.self]
+    }
+}
+
+enum SchemaV4: VersionedSchema {
+    static var versionIdentifier = Schema.Version(4, 0, 0)
+    static var models: [any PersistentModel.Type] {
+        // Live WordProgress, which now carries `masteredDate` for the daily streak goal.
         [WordProgress.self, AppSettings.self, DrillSession.self]
     }
 }
 
 enum MigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [SchemaV1.self, SchemaV2.self, SchemaV3.self]
+        [SchemaV1.self, SchemaV2.self, SchemaV3.self, SchemaV4.self]
     }
 
     static var stages: [MigrationStage] {
-        [migrateV1toV2, migrateV2toV3]
+        [migrateV1toV2, migrateV2toV3, migrateV3toV4]
     }
 
     // Migration from V1 to V2: Add wasPromotedToEasy field
@@ -84,6 +121,12 @@ enum MigrationPlan: SchemaMigrationPlan {
     static let migrateV2toV3 = MigrationStage.lightweight(
         fromVersion: SchemaV2.self,
         toVersion: SchemaV3.self
+    )
+
+    // Migration from V3 to V4: Add WordProgress.masteredDate (daily streak goal)
+    static let migrateV3toV4 = MigrationStage.lightweight(
+        fromVersion: SchemaV3.self,
+        toVersion: SchemaV4.self
     )
 }
 
@@ -135,7 +178,7 @@ struct GRE_VerbalApp: App {
     private static func makeContainer(useMigrationPlan: Bool) throws -> ModelContainer {
         let schema = Schema(
             [WordProgress.self, AppSettings.self, DrillSession.self],
-            version: SchemaV3.versionIdentifier
+            version: SchemaV4.versionIdentifier
         )
 
         let modelConfiguration = ModelConfiguration(
@@ -276,6 +319,12 @@ struct GRE_VerbalApp: App {
                 .preferredColorScheme(.dark)
                 .onAppear {
                     UIApplication.shared.isIdleTimerDisabled = true
+                }
+                .onOpenURL { url in
+                    // Handle greverbal://practice deep-link from shield notification
+                    if url.scheme == "greverbal" && url.host == "practice" {
+                        NotificationCenter.default.post(name: .openPracticeTab, object: nil)
+                    }
                 }
         }
         .modelContainer(modelContainer)

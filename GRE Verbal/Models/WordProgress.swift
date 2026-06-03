@@ -12,7 +12,10 @@ final class WordProgress {
     @Attribute var wasPromotedToEasy: Bool = false  // Track if word was promoted through repetition
     var lastReviewedDate: Date?
     var consecutiveCorrectCount: Int  // Track consecutive correct answers
-    
+    /// When the word most recently reached an Easy tier (natural or mastered).
+    /// Drives the daily streak goal: "words learned today". nil = not easy.
+    @Attribute var masteredDate: Date? = nil
+
     init(word: String) {
         self.word = word
         self.wrongCount = 0
@@ -21,6 +24,7 @@ final class WordProgress {
         self.wasPromotedToEasy = false
         self.lastReviewedDate = nil
         self.consecutiveCorrectCount = 0
+        self.masteredDate = nil
     }
     
     // Calculate difficulty tier based on progress
@@ -55,10 +59,11 @@ final class WordProgress {
             hasSeenOnce = true
             knewOnFirstTry = true
             consecutiveCorrectCount = 1
+            masteredDate = Date()        // reached Easy (Natural) today
         } else {
             // Increment consecutive correct count
             consecutiveCorrectCount += 1
-            
+
             // Promotion logic: 5 consecutive correct answers promotes the word one tier
             if consecutiveCorrectCount >= 5 && !knewOnFirstTry && !wasPromotedToEasy {
                 if wrongCount >= 20 {
@@ -68,6 +73,7 @@ final class WordProgress {
                 } else {
                     // Medium → Easy (Mastered)
                     wasPromotedToEasy = true
+                    masteredDate = Date()    // reached Easy (Mastered) today
                 }
             }
         }
@@ -99,6 +105,7 @@ final class WordProgress {
         wasPromotedToEasy = false
         consecutiveCorrectCount = 0
         lastReviewedDate = nil
+        masteredDate = nil
     }
 }
 

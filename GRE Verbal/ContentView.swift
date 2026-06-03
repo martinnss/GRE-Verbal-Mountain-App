@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import FamilyControls
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -37,6 +38,18 @@ struct ContentView: View {
                             Label("Timer", systemImage: "timer")
                         }
                         .tag(2)
+
+                    QuantMountainView()
+                        .tabItem {
+                            Label("Quant", systemImage: "mountain.2.fill")
+                        }
+                        .tag(3)
+
+                    ScreenTimeSettingsView()
+                        .tabItem {
+                            Label("Shield", systemImage: "shield.lefthalf.filled")
+                        }
+                        .tag(4)
                 }
                 .tint(Color(hex: "4ADE80"))
             } else {
@@ -49,6 +62,11 @@ struct ContentView: View {
             NotificationManager.shared.refreshOnLaunch(
                 todayCompleted: StreakManager.shared.todayCompleted
             )
+            // Resume blocking if it was configured before
+            ScreenTimeManager.shared.refreshState()
+            if ScreenTimeManager.shared.isAuthorized && ScreenTimeManager.shared.hasAppSelection {
+                ScreenTimeManager.shared.startBlockingSchedule()
+            }
         }
     }
     
@@ -101,6 +119,7 @@ struct ContentView: View {
                 repository: repository,
                 progressManager: progressManager
             )
+            ScreenTimeManager.shared.syncShieldVocabulary(repository: repository, progress: progressManager)
             isLoading = false
         } else {
             // Retry after a short delay if not loaded
@@ -110,6 +129,7 @@ struct ContentView: View {
                         repository: repository,
                         progressManager: progressManager
                     )
+                    ScreenTimeManager.shared.syncShieldVocabulary(repository: repository, progress: progressManager)
                 }
                 isLoading = false
             }

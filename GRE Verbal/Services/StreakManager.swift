@@ -43,6 +43,17 @@ final class StreakManager {
         return Calendar.current.isDateInToday(last)
     }
 
+    /// Fraction of the whole vocabulary that must be learned each day to secure
+    /// the streak.
+    static let dailyGoalFraction = 0.02
+
+    /// Number of words that must reach an Easy tier today to secure the streak —
+    /// 2% of the full deck, rounded up, at least 1.
+    func dailyGoal(totalWords: Int) -> Int {
+        guard totalWords > 0 else { return 1 }
+        return max(1, Int((Double(totalWords) * Self.dailyGoalFraction).rounded(.up)))
+    }
+
     // MARK: - Public API
 
     /// Call this when the user finishes a flashcard session.

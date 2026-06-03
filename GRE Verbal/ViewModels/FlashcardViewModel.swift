@@ -81,6 +81,7 @@ final class FlashcardViewModel {
         knownCount = 0
         unknownCount = 0
         isCardFlipped = false
+        showingSessionComplete = false   // clear last session's completion overlay
         sessionStartTime = Date()
         
         // Pre-cache audio for the deck
@@ -106,7 +107,19 @@ final class FlashcardViewModel {
         guard let word = currentWord else { return }
         progressManager.markWordAsKnown(word.word)
         knownCount += 1
+        evaluateStreakGoal()
         moveToNextCard()
+    }
+
+    /// Secure today's streak the moment the user has learned 2% of the deck
+    /// (words reaching an Easy tier today). No-op once today is already secured.
+    private func evaluateStreakGoal() {
+        let streak = StreakManager.shared
+        guard !streak.todayCompleted else { return }
+        let goal = streak.dailyGoal(totalWords: repository.allWords.count)
+        if progressManager.masteredTodayCount() >= goal {
+            streak.recordCompletion()
+        }
     }
     
     func markCurrentAsUnknown() {
@@ -131,7 +144,9 @@ final class FlashcardViewModel {
             }
         } else {
             showingSessionComplete = true
-            StreakManager.shared.recordCompletion()
+            evaluateStreakGoal()
+            ScreenTimeManager.shared.syncShieldVocabulary(repository: repository, progress: progressManager)
+            ScreenTimeManager.shared.startUnlockSession()
         }
     }
     

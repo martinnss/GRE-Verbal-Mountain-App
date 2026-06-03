@@ -2,12 +2,23 @@ import SwiftUI
 
 struct StreakCard: View {
     var streakManager: StreakManager
+    /// Words moved to an Easy tier today, and the daily target (2% of the deck).
+    var masteredToday: Int = 0
+    var dailyGoal: Int = 0
 
     @State private var flamePulse = false
+
+    private var remaining: Int { max(0, dailyGoal - masteredToday) }
+    private var goalProgress: Double {
+        guard dailyGoal > 0 else { return 0 }
+        return min(1, Double(masteredToday) / Double(dailyGoal))
+    }
+    private var goalMet: Bool { streakManager.todayCompleted || (dailyGoal > 0 && masteredToday >= dailyGoal) }
 
     var body: some View {
         VStack(spacing: 0) {
             mainRow
+            if dailyGoal > 0 { goalRow }
             Divider().background(.white.opacity(0.1)).padding(.horizontal, 4)
             weekRow
         }
@@ -92,6 +103,47 @@ struct StreakCard: View {
         .padding(.bottom, 16)
     }
 
+    // MARK: - Daily Goal Row
+
+    private var goalRow: some View {
+        VStack(spacing: 7) {
+            HStack(spacing: 6) {
+                Image(systemName: goalMet ? "checkmark.seal.fill" : "target")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(goalMet ? .green : flameColor)
+                Text(goalMet ? "Today's streak secured" : "Daily streak goal")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.75))
+                Spacer()
+                Text("\(min(masteredToday, dailyGoal))/\(dailyGoal) words")
+                    .font(.caption.weight(.bold).monospacedDigit())
+                    .foregroundStyle(goalMet ? .green : .white.opacity(0.85))
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(.white.opacity(0.08))
+                    Capsule()
+                        .fill(goalMet ? AnyShapeStyle(Color.green)
+                                      : AnyShapeStyle(LinearGradient(colors: flameGradient,
+                                                                     startPoint: .leading, endPoint: .trailing)))
+                        .frame(width: max(6, geo.size.width * goalProgress))
+                }
+            }
+            .frame(height: 6)
+
+            HStack {
+                Text(goalMet
+                     ? "Learn more to get ahead of tomorrow"
+                     : "\(remaining) more word\(remaining == 1 ? "" : "s") to unlock today's streak")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.45))
+                Spacer()
+            }
+        }
+        .padding(.bottom, 14)
+    }
+
     // MARK: - Status Badge
 
     private var statusBadge: some View {
@@ -105,7 +157,8 @@ struct StreakCard: View {
                     .background(.green.opacity(0.12))
                     .clipShape(Capsule())
             } else {
-                Label("Study today", systemImage: "bell.fill")
+                Label(dailyGoal > 0 ? "\(remaining) to go" : "Study today",
+                      systemImage: dailyGoal > 0 ? "target" : "bell.fill")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(flameColor)
                     .padding(.horizontal, 8)
@@ -210,7 +263,8 @@ struct StreakCard: View {
     ZStack {
         Color(hex: "060D07").ignoresSafeArea()
         VStack(spacing: 20) {
-            StreakCard(streakManager: StreakManager.shared)
+            StreakCard(streakManager: StreakManager.shared, masteredToday: 8, dailyGoal: 21)
+            StreakCard(streakManager: StreakManager.shared, masteredToday: 21, dailyGoal: 21)
         }
         .padding(.horizontal, 20)
     }

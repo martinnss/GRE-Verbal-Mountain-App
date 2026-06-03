@@ -73,6 +73,7 @@ struct ProgressExportData: Codable {
     let wasPromotedToEasy: Bool
     let consecutiveCorrectCount: Int
     let lastReviewedDate: Date?
+    var masteredDate: Date? = nil
 }
 
 // MARK: - Progress Manager
@@ -191,6 +192,28 @@ final class ProgressManager {
         }
     }
     
+    /// Words the user struggles with, hardest first. Reads only the in-memory
+    /// cache (already-studied words) so it never inserts new WordProgress rows.
+    /// Hard tier (20+ wrong) ranks above Medium; within a tier, more wrong = earlier.
+    func strugglingWords() -> [String] {
+        progressCache.values
+            .filter { $0.hasSeenOnce && ($0.difficultyTier == .hard || $0.difficultyTier == .medium) }
+            .sorted { lhs, rhs in
+                if lhs.difficultyTier == rhs.difficultyTier { return lhs.wrongCount > rhs.wrongCount }
+                return lhs.difficultyTier == .hard   // hard before medium
+            }
+            .map { $0.word }
+    }
+
+    /// How many words the user moved into an Easy tier (Natural or Mastered)
+    /// today. This is the daily streak metric — "words learned today".
+    func masteredTodayCount() -> Int {
+        progressCache.values.filter { p in
+            guard let date = p.masteredDate, Calendar.current.isDateInToday(date) else { return false }
+            return p.difficultyTier == .easyNatural || p.difficultyTier == .easyMastered
+        }.count
+    }
+
     // Filter words by difficulty tiers
     func filterWords(_ words: [VocabWord], byTiers tiers: [DifficultyTier]) -> [VocabWord] {
         return words.filter { word in
@@ -229,7 +252,8 @@ final class ProgressManager {
                     knewOnFirstTry: progress.knewOnFirstTry,
                     wasPromotedToEasy: progress.wasPromotedToEasy,
                     consecutiveCorrectCount: progress.consecutiveCorrectCount,
-                    lastReviewedDate: progress.lastReviewedDate
+                    lastReviewedDate: progress.lastReviewedDate,
+                    masteredDate: progress.masteredDate
                 )
             }
     }
@@ -245,6 +269,7 @@ final class ProgressManager {
             progress.wasPromotedToEasy = item.wasPromotedToEasy
             progress.consecutiveCorrectCount = item.consecutiveCorrectCount
             progress.lastReviewedDate = item.lastReviewedDate
+            progress.masteredDate = item.masteredDate
         }
         
         saveContext()

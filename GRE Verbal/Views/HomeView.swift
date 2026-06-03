@@ -16,7 +16,11 @@ struct HomeView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         // Streak card
-                        StreakCard(streakManager: .shared)
+                        StreakCard(
+                            streakManager: .shared,
+                            masteredToday: viewModel.progressManager.masteredTodayCount(),
+                            dailyGoal: StreakManager.shared.dailyGoal(totalWords: viewModel.repository.allWords.count)
+                        )
 
                         // Statistics card
                         statisticsCard

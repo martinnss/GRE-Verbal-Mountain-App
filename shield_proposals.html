@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRE Verbal — Shield Design Proposals</title>
+<style>
+  :root{
+    --green:#4ADE80;
+    --bg:#060D07;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+    background:radial-gradient(circle at 50% 0%,#0d1b10,#04060500 60%),#040605;
+    color:#e8f5ea;
+    padding:48px 24px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1{font-size:30px;font-weight:800;text-align:center;letter-spacing:-.02em}
+  .sub{text-align:center;color:#7f9a85;margin:10px auto 6px;max-width:640px;font-size:15px;line-height:1.5}
+  .note{text-align:center;color:#5e7a66;margin:0 auto 44px;max-width:640px;font-size:13px;line-height:1.5}
+  .note b{color:#9fc4a8}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:48px 32px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .card{display:flex;flex-direction:column;align-items:center}
+  .tag{
+    font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--green);margin-bottom:4px
+  }
+  .name{font-size:21px;font-weight:800;margin-bottom:6px;letter-spacing:-.01em}
+  .desc{font-size:13px;color:#8aa692;text-align:center;max-width:300px;line-height:1.55;margin-bottom:20px;min-height:58px}
+  .feas{font-size:11px;color:#6d8975;margin-top:16px;max-width:280px;text-align:center;line-height:1.5}
+  .feas b{color:#a7cbb0}
+
+  /* ---- iPhone frame ---- */
+  .phone{
+    width:300px;height:620px;border-radius:52px;
+    background:#000;padding:13px;
+    box-shadow:0 0 0 2px #1c241e,0 30px 70px -20px #000,0 0 60px -20px var(--green);
+    position:relative;
+  }
+  .notch{
+    position:absolute;top:13px;left:50%;transform:translateX(-50%);
+    width:104px;height:30px;background:#000;border-radius:0 0 18px 18px;z-index:20
+  }
+  .screen{
+    width:100%;height:100%;border-radius:40px;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    padding:0 22px 30px;
+  }
+  /* faint blurred "app behind shield" */
+  .behind{position:absolute;inset:0;filter:blur(18px) brightness(.5);opacity:.5;z-index:0}
+
+  .shield{
+    position:relative;z-index:2;width:100%;
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+  }
+  .icon-wrap{margin-bottom:22px;display:flex;align-items:center;justify-content:center}
+  .title{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+  .body{font-size:13px;line-height:1.5;color:#d7e7da;opacity:.85;margin-bottom:22px;max-width:230px}
+  .btn{
+    width:100%;padding:13px;border-radius:14px;font-size:15px;font-weight:700;
+    margin-bottom:10px;border:none;cursor:pointer
+  }
+  .btn.secondary{background:transparent;color:#fff;opacity:.6;font-weight:600}
+
+  /* ===================== 1. EMBER STREAK ===================== */
+  .s1 .screen{background:linear-gradient(180deg,#1a0d05,#0a0502)}
+  .s1 .behind{background:linear-gradient(45deg,#f97316,#fbbf24)}
+  .flame{position:relative;width:120px;height:120px}
+  .flame .ring{position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle,#f9731633,transparent 65%);
+    animation:pulse 2.4s ease-in-out infinite}
+  .flame .emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:62px;animation:flicker 1.6s ease-in-out infinite;filter:drop-shadow(0 0 18px #f97316)}
+  .streaknum{position:absolute;bottom:-6px;right:6px;background:#f97316;color:#1a0d05;
+    font-size:15px;font-weight:900;width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px #f9731688}
+  .s1 .title{color:#fbbf24}
+  .s1 .btn{background:linear-gradient(90deg,#f97316,#fbbf24);color:#1a0d05}
+  @keyframes flicker{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.08) rotate(2deg)}}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.25);opacity:.3}}
+
+  /* ===================== 2. NEURAL LOCK ===================== */
+  .s2 .screen{background:radial-gradient(circle at 50% 35%,#0a1530,#03060f)}
+  .s2 .behind{background:linear-gradient(45deg,#6366f1,#06b6d4)}
+  .neural{position:relative;width:130px;height:130px}
+  .neural svg{width:100%;height:100%}
+  .neural .node{fill:#22d3ee;filter:drop-shadow(0 0 6px #22d3ee)}
+  .neural .edge{stroke:#22d3ee;stroke-width:1.4;opacity:.4;
+    stroke-dasharray:4 4;animation:dash 1.2s linear infinite}
+  .neural .core{animation:breathe 3s ease-in-out infinite;transform-origin:center}
+  @keyframes dash{to{stroke-dashoffset:-16}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .s2 .title{color:#22d3ee}
+  .s2 .btn{background:linear-gradient(90deg,#6366f1,#22d3ee);color:#03060f}
+
+  /* ===================== 3. SUMMIT ===================== */
+  .s3 .screen{background:linear-gradient(180deg,#0a1f17,#040b08)}
+  .s3 .behind{background:linear-gradient(45deg,#10b981,#34d399)}
+  .summit{position:relative;width:150px;height:120px}
+  .summit svg{width:100%;height:100%;overflow:visible}
+  .summit .mtn{fill:#0e2a20;stroke:#34d399;stroke-width:1.5}
+  .summit .snow{fill:#34d399;opacity:.9}
+  .summit .path{stroke:#facc15;stroke-width:2;stroke-dasharray:3 5;fill:none;
+    animation:dash 1.4s linear infinite}
+  .summit .flag{animation:wave 2s ease-in-out infinite;transform-origin:bottom left}
+  @keyframes wave{0%,100%{transform:skewX(0)}50%{transform:skewX(-12deg)}}
+  .progresslbl{position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+    background:#facc15;color:#0a1f17;font-size:11px;font-weight:900;padding:2px 9px;border-radius:20px}
+  .s3 .title{color:#34d399}
+  .s3 .btn{background:linear-gradient(90deg,#10b981,#34d399);color:#04110b}
+
+  /* ===================== 4. ARCADE ===================== */
+  .s4 .screen{background:#0a0014;font-family:"Courier New",monospace}
+  .s4 .behind{background:linear-gradient(45deg,#ec4899,#8b5cf6)}
+  .arcade{position:relative;width:150px;height:110px;
+    image-rendering:pixelated}
+  .pix-lock{font-size:64px;animation:hop 1.4s steps(2) infinite;filter:drop-shadow(3px 3px 0 #ec4899)}
+  @keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,#ffffff08 0 2px,transparent 2px 4px);pointer-events:none;z-index:5}
+  .s4 .title{color:#f0abfc;text-shadow:2px 2px 0 #8b5cf6;font-family:"Courier New",monospace;letter-spacing:.04em}
+  .s4 .body{font-family:"Courier New",monospace;color:#f5d0fe}
+  .s4 .btn{background:#ec4899;color:#0a0014;border-radius:4px;font-family:"Courier New",monospace;
+    text-transform:uppercase;letter-spacing:.06em;box-shadow:3px 3px 0 #8b5cf6}
+
+  /* ===================== 5. LEXICON ===================== */
+  .s5 .screen{background:linear-gradient(180deg,#0d1410,#05080640)}
+  .s5 .behind{background:linear-gradient(45deg,#4ADE80,#0ea5e9)}
+  .lex-card{
+    background:linear-gradient(160deg,#15241a,#0c150f);
+    border:1px solid #4ade8033;border-radius:20px;padding:22px 20px;width:100%;
+    box-shadow:0 0 40px -16px var(--green);position:relative;overflow:hidden
+  }
+  .lex-card::before{content:"";position:absolute;top:-40%;left:-60%;width:80%;height:180%;
+    background:linear-gradient(90deg,transparent,#ffffff14,transparent);
+    transform:rotate(20deg);animation:sheen 3.2s ease-in-out infinite}
+  @keyframes sheen{0%{left:-60%}60%,100%{left:140%}}
+  .lex-word{font-size:30px;font-weight:900;color:#fff;letter-spacing:-.01em}
+  .lex-ipa{font-size:13px;color:var(--green);margin:2px 0 12px;font-style:italic}
+  .lex-def{font-size:13px;color:#cfe6d5;line-height:1.5;text-align:left}
+  .lex-pos{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.1em;color:#0a1f12;background:var(--green);padding:2px 8px;border-radius:6px;margin-bottom:10px}
+  .s5 .title{color:var(--green);margin-top:20px}
+  .s5 .btn{background:var(--green);color:#03120a}
+
+  /* ===================== 6. AURORA MINIMAL ===================== */
+  .s6 .screen{background:#04070a}
+  .s6 .behind{background:linear-gradient(45deg,#4ADE80,#a78bfa)}
+  .aurora{position:absolute;inset:0;z-index:1;opacity:.55;
+    background:
+      radial-gradient(40% 30% at 30% 20%,#4ade8055,transparent 70%),
+      radial-gradient(40% 30% at 70% 30%,#a78bfa55,transparent 70%),
+      radial-gradient(50% 40% at 50% 70%,#22d3ee44,transparent 70%);
+    filter:blur(8px);animation:drift 7s ease-in-out infinite}
+  @keyframes drift{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.08)}}
+  .min-glyph{width:96px;height:96px;border-radius:50%;
+    border:1.5px solid #ffffff33;display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(6px);background:#ffffff08;position:relative}
+  .min-glyph::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;
+    border:1.5px solid transparent;border-top-color:var(--green);animation:spin 3s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .min-glyph svg{width:42px;height:42px}
+  .s6 .title{color:#fff;font-weight:700}
+  .s6 .body{color:#a9b6c4}
+  .s6 .btn{background:#fff;color:#04070a}
+
+  .pickbar{
+    max-width:1180px;margin:60px auto 0;padding:24px;border-radius:18px;
+    background:#0c150f;border:1px solid #1d2a21;text-align:center;color:#9fc4a8;font-size:14px;line-height:1.6
+  }
+  .pickbar b{color:#fff}
+</style>
+</head>
+<body>
+  <h1>🛡️ Shield Design Proposals</h1>
+  <p class="sub">Six directions for the screen users see when they open a blocked app. Pick one (or mix elements) and I'll build it.</p>
+  <p class="note"><b>Reality check:</b> iOS renders the shield from a fixed template — background, one <b>icon image</b>, title, subtitle, two buttons. The motion below shows the <i>vibe</i>; on device the icon ships as a richly-rendered static image. The big differentiator is what we draw into that icon (and dynamic data like your streak or a live vocab word).</p>
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <div class="card s1">
+      <div class="tag">Option 1</div>
+      <div class="name">Ember Streak</div>
+      <div class="desc">Loss-aversion play: your study streak literally burns. "Don't break the chain" energy.</div>
+      <div class="phone"><div class="notch"></div><div class="screen"><div class="behind"></div>
+        <div class="shield">
+          <div class="icon-wrap"><div class="flame">
+            <div class="ring"></div><div class="emoji">🔥</div><div class="streaknum">7</div>
+          </div></div>
+          <div class="title">Keep Your 7-Day Streak</div>
+          <div class="body">Instagram is locked. Finish one verbal drill to feed the flame — and unlock 15 min.</div>
+          <button class="btn">Study to Unlock 🔥</button>
+          <button class="btn secondary">Not now</button>
+        </div>
+      </div></div>
+      <div class="feas"><b>Dynamic:</b> real streak number burned into the icon. Fully buildable.</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card s2">
+      <div class="tag">Option 2</div>
+      <div class="name">Neural Lock</div>
+      <div class="desc">"Train your brain to unlock." A glowing synapse network gated behind practice.</div>
+      <div class="phone"><div class="notch"></div><div class="screen"><div class="behind"></div>
+        <div class="shield">
+          <div class="icon-wrap"><div class="neural">
+            <svg viewBox="0 0 130 130">
+              <g class="core">
+                <line class="edge" x1="65" y1="65" x2="30" y2="30"/>
+                <line class="edge" x1="65" y1="65" x2="100" y2="35"/>
+                <line class="edge" x1="65" y1="65" x2="28" y2="95"/>
+                <line class="edge" x1="65" y1="65" x2="102" y2="98"/>
+                <line class="edge" x1="30" y1="30" x2="100" y2="35"/>
+                <circle class="node" cx="30" cy="30" r="5"/>
+                <circle class="node" cx="100" cy="35" r="5"/>
+                <circle class="node" cx="28" cy="95" r="5"/>
+                <circle class="node" cx="102" cy="98" r="5"/>
+                <circle class="node" cx="65" cy="65" r="9"/>
+              </g>
+            </svg>
+          </div></div>
+          <div class="title">Unlock With Your Mind</div>
+          <div class="body">This app is paused. Complete a verbal drill to light up your network and earn 15 min.</div>
+          <button class="btn">Begin Practice</button>
+          <button class="btn secondary">Maybe later</button>
+        </div>
+      </div></div>
+      <div class="feas"><b>Static</b> glowing-network icon, vector-crisp. Buildable; "lit vs dim" variants by progress.</div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card s3">
+      <div class="tag">Option 3</div>
+      <div class="name">Summit</div>
+      <div class="desc">Ties into your Quant Mountain. A flag-to-the-peak metaphor — distraction = base camp.</div>
+      <div class="phone"><div class="notch"></div><div class="screen"><div class="behind"></div>
+        <div class="shield">
+          <div class="icon-wrap"><div class="summit">
+            <div class="progresslbl">3 / 5 to peak</div>
+            <svg viewBox="0 0 150 120">
+              <polygon class="mtn" points="10,115 60,30 90,70 110,45 140,115"/>
+              <polygon class="snow" points="60,30 48,48 72,48"/>
+              <polygon class="snow" points="110,45 100,60 120,60"/>
+              <path class="path" d="M30,115 Q55,90 60,70 T60,38"/>
+              <g class="flag"><line x1="60" y1="38" x2="60" y2="22" stroke="#facc15" stroke-width="2"/>
+                <polygon points="60,22 78,27 60,32" fill="#facc15"/></g>
+            </svg>
+          </div></div>
+          <div class="title">Climb Before You Scroll</div>
+          <div class="body">YouTube is at base camp. One drill plants your flag higher — and unlocks 15 min.</div>
+          <button class="btn">Take the Next Step</button>
+          <button class="btn secondary">Stay at base</button>
+        </div>
+      </div></div>
+      <div class="feas"><b>Dynamic:</b> flag height + "x/5" reflect real daily progress. On-brand with Quant Mountain.</div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card s4">
+      <div class="tag">Option 4</div>
+      <div class="name">Arcade Locked</div>
+      <div class="desc">Playful retro pixel "GAME LOCKED" screen. Makes the block feel like a fun challenge.</div>
+      <div class="phone"><div class="notch"></div><div class="screen"><div class="behind"></div><div class="scan"></div>
+        <div class="shield">
+          <div class="icon-wrap"><div class="arcade"><div class="pix-lock">🔒</div></div></div>
+          <div class="title">▶ LEVEL LOCKED</div>
+          <div class="body">INSERT 1 DRILL TO CONTINUE.<br>REWARD: 15:00 UNLOCKED</div>
+          <button class="btn">PRESS START</button>
+          <button class="btn secondary">quit</button>
+        </div>
+      </div></div>
+      <div class="feas"><b>Static</b> pixel-art lock icon + arcade copy. Fully buildable; very distinct personality.</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card s5">
+      <div class="tag">Option 5 — boldest</div>
+      <div class="name">Lexicon</div>
+      <div class="desc">Turn the block into learning. The shield teaches a GRE word every time — friction becomes value.</div>
+      <div class="phone"><div class="notch"></div><div class="screen"><div class="behind"></div>
+        <div class="shield">
+          <div class="lex-card">
+            <span class="lex-pos">adjective</span>
+            <div class="lex-word">Perfunctory</div>
+            <div class="lex-ipa">/pərˈfəNG(k)t(ə)rē/</div>
+            <div class="lex-def">Done routinely, with little care or interest — exactly how you're about to scroll.</div>
+          </div>
+          <div class="title">Word Before World</div>
+          <button class="btn" style="margin-top:18px">Learn & Unlock</button>
+          <button class="btn secondary">Skip the lesson</button>
+        </div>
+      </div></div>
+      <div class="feas"><b>Dynamic:</b> a fresh word each block, rendered into the icon image. Uniquely on-brand for a GRE app.</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card s6">
+      <div class="tag">Option 6</div>
+      <div class="name">Aurora Minimal</div>
+      <div class="desc">Premium, calm, Apple-like. Soft aurora glow, a single spinning ring, almost no friction-shaming.</div>
+      <div class="phone"><div class="notch"></div><div class="screen"><div class="aurora"></div><div class="behind"></div>
+        <div class="shield">
+          <div class="icon-wrap"><div class="min-glyph">
+            <svg viewBox="0 0 42 42" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round">
+              <path d="M21 6 L21 21 L31 27"/><circle cx="21" cy="21" r="15" stroke="#ffffff44"/>
+            </svg>
+          </div></div>
+          <div class="title">A moment of focus</div>
+          <div class="body">This app rests until your verbal practice is done. Then it's yours for 15 minutes.</div>
+          <button class="btn">Start practice</button>
+          <button class="btn secondary">Later</button>
+        </div>
+      </div></div>
+      <div class="feas"><b>Static</b> ring/aurora icon. The aurora drift is faked here; on device it's a beautiful still gradient.</div>
+    </div>
+
+  </div>
+
+  <div class="pickbar">
+    👉 Tell me a number (or "Lexicon", "Ember", etc.). Want to mix? e.g. <b>"Ember palette + Lexicon's word card."</b><br>
+    I'll then render the icon as a real <b>UIImage</b> in <b>GREShieldConfig</b> and wire up dynamic data (streak / progress / word).
+  </div>
+</body>
+</html>
