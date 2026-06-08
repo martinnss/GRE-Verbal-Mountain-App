@@ -5,16 +5,19 @@ import SwiftData
 
 @Model
 final class WordProgress {
-    @Attribute(.unique) var word: String
-    var wrongCount: Int
-    var hasSeenOnce: Bool
-    var knewOnFirstTry: Bool
-    @Attribute var wasPromotedToEasy: Bool = false  // Track if word was promoted through repetition
-    var lastReviewedDate: Date?
-    var consecutiveCorrectCount: Int  // Track consecutive correct answers
+    // CloudKit mirroring forbids unique constraints and requires every stored
+    // property to be optional or defaulted. Uniqueness is enforced in
+    // ProgressManager (in-memory cache + dedup-on-load), not by the store.
+    var word: String = ""
+    var wrongCount: Int = 0
+    var hasSeenOnce: Bool = false
+    var knewOnFirstTry: Bool = false
+    var wasPromotedToEasy: Bool = false  // Track if word was promoted through repetition
+    var lastReviewedDate: Date? = nil
+    var consecutiveCorrectCount: Int = 0  // Track consecutive correct answers
     /// When the word most recently reached an Easy tier (natural or mastered).
     /// Drives the daily streak goal: "words learned today". nil = not easy.
-    @Attribute var masteredDate: Date? = nil
+    var masteredDate: Date? = nil
 
     init(word: String) {
         self.word = word
@@ -113,11 +116,11 @@ final class WordProgress {
 
 @Model
 final class AppSettings {
-    var selectedGroups: [Int]
-    var selectedDifficulties: [String]
-    var isCumulativeMode: Bool
-    var hasCompletedOnboarding: Bool
-    
+    var selectedGroups: [Int] = [1]
+    var selectedDifficulties: [String] = []
+    var isCumulativeMode: Bool = false
+    var hasCompletedOnboarding: Bool = false
+
     init() {
         self.selectedGroups = [1]
         self.selectedDifficulties = DifficultyTier.allCases.map { $0.rawValue }

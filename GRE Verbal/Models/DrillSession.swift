@@ -3,16 +3,17 @@ import SwiftData
 
 @Model
 final class DrillSession {
-    var date: Date
-    var questionCount: Int
-    var estimatedTimePerQuestion: Double  // seconds
-    var totalElapsedTime: Double          // seconds
-    var questionTimes: [Double]           // legacy: locked-in times in locking order
-    var wrongQuestions: [Int]             // legacy: 1-based question numbers marked wrong
+    // All properties defaulted for CloudKit mirroring compatibility.
+    var date: Date = Date.now
+    var questionCount: Int = 0
+    var estimatedTimePerQuestion: Double = 0  // seconds
+    var totalElapsedTime: Double = 0          // seconds
+    var questionTimes: [Double] = []          // legacy: locked-in times in locking order
+    var wrongQuestions: [Int] = []            // legacy: 1-based question numbers marked wrong
 
     // Per-question detail (populated for new sessions only; empty = legacy session)
-    var perQuestionStates: [String]       // 0-based: "correct" | "wrong" | "unanswered"
-    var perQuestionElapsed: [Double]      // 0-based: seconds spent on each question (0 = unanswered)
+    var perQuestionStates: [String] = []      // 0-based: "correct" | "wrong" | "unanswered"
+    var perQuestionElapsed: [Double] = []     // 0-based: seconds spent on each question (0 = unanswered)
 
     private static let correctAliases: Set<String> = ["correct", "right"]
     private static let wrongAliases: Set<String> = ["wrong", "incorrect", "x"]
