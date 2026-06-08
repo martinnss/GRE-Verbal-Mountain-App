@@ -492,11 +492,14 @@ struct FlashcardSessionView: View {
 struct SessionCompleteView: View {
     @Bindable var viewModel: FlashcardViewModel
     let onDismiss: () -> Void
-    
+
+    @State private var screenTime = ScreenTimeManager.shared
+    @State private var unlockConfirmed = false
+
     var body: some View {
         VStack(spacing: 30) {
             Spacer()
-            
+
             // Trophy
             Image(systemName: "trophy.fill")
                 .font(.system(size: 70))
@@ -504,25 +507,30 @@ struct SessionCompleteView: View {
                     LinearGradient(colors: [.yellow, .orange], startPoint: .top, endPoint: .bottom)
                 )
                 .shadow(color: .orange.opacity(0.5), radius: 20)
-            
+
             Text("Session Complete!")
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
-            
+
             // Stats
             HStack(spacing: 20) {
                 ResultCard(value: viewModel.knownCount, label: "Known", color: .green)
                 ResultCard(value: viewModel.unknownCount, label: "Learning", color: .red)
             }
             .padding(.horizontal, 30)
-            
+
             Text("Duration: \(viewModel.sessionDuration)")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.5))
-            
+
+            // Unlock row — only shown when blocking is configured
+            if screenTime.isAuthorized && screenTime.hasAppSelection {
+                unlockStatusRow
+            }
+
             Spacer()
-            
+
             VStack(spacing: 12) {
                 Button(action: {
                     viewModel.showingSessionComplete = false
@@ -539,7 +547,7 @@ struct SessionCompleteView: View {
                     .background(LinearGradient(colors: [Color(hex: "22C55E"), Color(hex: "8B5E3C")], startPoint: .leading, endPoint: .trailing))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-                
+
                 Button(action: onDismiss) {
                     Text("Done")
                         .font(.headline)
@@ -552,6 +560,45 @@ struct SessionCompleteView: View {
             }
             .padding(.horizontal, 30)
             .padding(.bottom, 40)
+        }
+        .onAppear {
+            screenTime.refreshState()
+            unlockConfirmed = false
+        }
+    }
+
+    @ViewBuilder
+    private var unlockStatusRow: some View {
+        if screenTime.isSessionActive {
+            HStack(spacing: 8) {
+                Image(systemName: "lock.open.fill")
+                    .foregroundStyle(Color(hex: "4ADE80"))
+                Text("Apps unlocked · \(screenTime.minutesRemainingInSession) min left")
+                    .font(.subheadline)
+                    .foregroundStyle(Color(hex: "4ADE80"))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(Color(hex: "4ADE80").opacity(0.12))
+            .clipShape(Capsule())
+        } else {
+            Button(action: {
+                screenTime.startUnlockSession()
+                unlockConfirmed = true
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: unlockConfirmed ? "checkmark.circle.fill" : "lock.open.fill")
+                    Text(unlockConfirmed ? "Unlocked! 15 min started" : "Unlock 15 minutes")
+                        .fontWeight(.semibold)
+                }
+                .font(.subheadline)
+                .foregroundStyle(unlockConfirmed ? Color(hex: "4ADE80") : .black)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(unlockConfirmed ? Color(hex: "4ADE80").opacity(0.2) : Color(hex: "4ADE80"))
+                .clipShape(Capsule())
+            }
+            .disabled(unlockConfirmed)
         }
     }
 }
