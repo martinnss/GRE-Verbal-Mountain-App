@@ -4,9 +4,10 @@ import SwiftData
 // MARK: - Question State
 
 enum QuestionState {
-    case pending
-    case correct
-    case wrong
+    case pending   // not yet visited
+    case answered  // visited but verdict not given (gray)
+    case correct   // marked correct (green)
+    case wrong     // marked wrong (red)
 }
 
 // MARK: - Drill Phase
@@ -68,7 +69,7 @@ final class DrillTimerViewModel {
             switch state {
             case .pending:
                 return nil
-            case .correct, .wrong:
+            case .answered, .correct, .wrong:
                 return idx < questionElapsedTimes.count ? questionElapsedTimes[idx] : nil
             }
         }
@@ -76,12 +77,12 @@ final class DrillTimerViewModel {
         return completedTimes.reduce(0, +) / Double(completedTimes.count)
     }
 
-    // Time remaining divided by pending (not-yet-done) questions
+    // Time remaining divided by not-yet-visited (pending) questions
     var avgTimeRemaining: Double {
         let pendingCount = questionStates.reduce(0) { partial, state in
             switch state {
             case .pending: return partial + 1
-            case .correct, .wrong: return partial
+            case .answered, .correct, .wrong: return partial
             }
         }
         guard pendingCount > 0, totalElapsed > 0 else { return 0 }
@@ -93,7 +94,7 @@ final class DrillTimerViewModel {
         questionStates.reduce(0) { partial, state in
             switch state {
             case .pending: return partial
-            case .correct, .wrong: return partial + 1
+            case .answered, .correct, .wrong: return partial + 1
             }
         }
     }
@@ -102,7 +103,7 @@ final class DrillTimerViewModel {
         questionStates.enumerated().compactMap { idx, state in
             switch state {
             case .wrong: return idx + 1
-            case .pending, .correct: return nil
+            case .pending, .answered, .correct: return nil
             }
         }
     }
@@ -143,11 +144,14 @@ final class DrillTimerViewModel {
             let delta = min(1.0, max(0.0, now.timeIntervalSince(previousTick)))
             self.totalElapsed += delta
 
-            // Only accumulate time for the currently focused question (if still pending)
+            // Accumulate time for the currently focused question when pending or answered
             let idx = self.currentQuestion - 1
             if idx >= 0, idx < self.questionElapsedTimes.count {
-                if case .pending = self.questionStates[idx] {
+                switch self.questionStates[idx] {
+                case .pending, .answered:
                     self.questionElapsedTimes[idx] += delta
+                case .correct, .wrong:
+                    break
                 }
             }
         }
@@ -169,50 +173,49 @@ final class DrillTimerViewModel {
 
     // MARK: - Question Interactions
 
-    /// Single tap:
-    ///   - If tapping the current (focused) question -> mark it correct
-    ///   - If tapping any other pending question -> navigate (focus) without marking
+    /// Single tap cycles through states:
+    ///   Current question:  pending → answered → correct (advances) ; correct/wrong → toggle
+    ///   Other question:    pending/answered → navigate ; correct/wrong → cycle correct↔wrong↔pending
     func tapQuestion(_ number: Int) {
         let idx = number - 1
         guard idx >= 0, idx < questionStates.count, started else { return }
 
         if number == currentQuestion {
-            guard isPending(questionStates[idx]) else { return }
-            lockQuestion(idx, state: .correct)
+            switch questionStates[idx] {
+            case .pending:
+                // First tap: mark as viewed/answered (gray) and advance to next unvisited
+                lockQuestion(idx, state: .answered)
+            case .answered:
+                // Second tap: mark correct and advance to next
+                lockQuestion(idx, state: .correct)
+            case .correct:
+                // Tap correct: mark wrong and advance to next
+                lockQuestion(idx, state: .wrong)
+            case .wrong:
+                // Tap wrong: revert to pending (no advance)
+                questionStates[idx] = .pending
+            }
         } else {
-            // Navigate: only move focus to pending questions
-            guard isPending(questionStates[idx]) else { return }
-            currentQuestion = number
-        }
-    }
-
-    /// Double tap:
-    ///   - If question is pending -> mark it wrong (and advance)
-    ///   - If question is correct -> change it to wrong
-    ///   - If question is wrong -> revert to pending (default state)
-    func longPressQuestion(_ number: Int) {
-        let idx = number - 1
-        guard idx >= 0, idx < questionStates.count, started else { return }
-
-        switch questionStates[idx] {
-        case .pending:
-            currentQuestion = number
-            lockQuestion(idx, state: .wrong)
-        case .correct:
-            questionStates[idx] = .wrong
-            currentQuestion = number
-        case .wrong:
-            questionStates[idx] = .pending
-            currentQuestion = number
+            switch questionStates[idx] {
+            case .pending, .answered:
+                // Navigate to unfinished questions
+                currentQuestion = number
+            case .correct:
+                // Retroactively toggle correct → wrong
+                questionStates[idx] = .wrong
+            case .wrong:
+                // Retroactively toggle wrong → pending
+                questionStates[idx] = .pending
+            }
         }
     }
 
     private func lockQuestion(_ idx: Int, state: QuestionState) {
         questionStates[idx] = state
 
-        // Advance currentQuestion to next pending
-        let next = (idx + 1 ..< questionStates.count).first { isPending(questionStates[$0]) }
-            ?? (0 ..< idx).first { isPending(questionStates[$0]) }
+        // Advance currentQuestion to next unvisited (pending) question
+        let next = (idx + 1 ..< questionStates.count).first { isUnvisited(questionStates[$0]) }
+            ?? (0 ..< idx).first { isUnvisited(questionStates[$0]) }
 
         if let next {
             currentQuestion = next + 1
@@ -221,10 +224,9 @@ final class DrillTimerViewModel {
         }
     }
 
-    private func isPending(_ state: QuestionState) -> Bool {
-        if case .pending = state {
-            return true
-        }
+    /// True only for questions not yet interacted with (blank)
+    private func isUnvisited(_ state: QuestionState) -> Bool {
+        if case .pending = state { return true }
         return false
     }
 
@@ -256,16 +258,17 @@ final class DrillTimerViewModel {
             switch state {
             case .pending:
                 return nil
-            case .correct, .wrong:
+            case .answered, .correct, .wrong:
                 return idx < questionElapsedTimes.count ? questionElapsedTimes[idx] : nil
             }
         }
 
-        // Build per-question state strings (pending -> unanswered at save time)
+        // Build per-question state strings
         let states: [String] = questionStates.map { state in
             switch state {
             case .correct:  return "correct"
             case .wrong:    return "wrong"
+            case .answered: return "answered"
             case .pending:  return "unanswered"
             }
         }
