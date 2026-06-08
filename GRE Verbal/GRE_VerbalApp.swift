@@ -97,18 +97,51 @@ enum SchemaV3: VersionedSchema {
 enum SchemaV4: VersionedSchema {
     static var versionIdentifier = Schema.Version(4, 0, 0)
     static var models: [any PersistentModel.Type] {
-        // Live WordProgress, which now carries `masteredDate` for the daily streak goal.
+        // Frozen WordProgress (unique `word`, no property defaults) describes the
+        // on-disk v4 store. AppSettings/DrillSession only gained Swift defaults in
+        // v5 (a non-breaking change), so they stay live.
+        [WordProgress.self, AppSettings.self, DrillSession.self]
+    }
+
+    @Model
+    final class WordProgress {
+        @Attribute(.unique) var word: String
+        var wrongCount: Int
+        var hasSeenOnce: Bool
+        var knewOnFirstTry: Bool
+        @Attribute var wasPromotedToEasy: Bool = false
+        var lastReviewedDate: Date?
+        var consecutiveCorrectCount: Int
+        @Attribute var masteredDate: Date? = nil
+
+        init(word: String) {
+            self.word = word
+            self.wrongCount = 0
+            self.hasSeenOnce = false
+            self.knewOnFirstTry = false
+            self.wasPromotedToEasy = false
+            self.lastReviewedDate = nil
+            self.consecutiveCorrectCount = 0
+            self.masteredDate = nil
+        }
+    }
+}
+
+// CloudKit-compatible schema: no unique constraints, every property defaulted.
+enum SchemaV5: VersionedSchema {
+    static var versionIdentifier = Schema.Version(5, 0, 0)
+    static var models: [any PersistentModel.Type] {
         [WordProgress.self, AppSettings.self, DrillSession.self]
     }
 }
 
 enum MigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [SchemaV1.self, SchemaV2.self, SchemaV3.self, SchemaV4.self]
+        [SchemaV1.self, SchemaV2.self, SchemaV3.self, SchemaV4.self, SchemaV5.self]
     }
 
     static var stages: [MigrationStage] {
-        [migrateV1toV2, migrateV2toV3, migrateV3toV4]
+        [migrateV1toV2, migrateV2toV3, migrateV3toV4, migrateV4toV5]
     }
 
     // Migration from V1 to V2: Add wasPromotedToEasy field
@@ -128,6 +161,13 @@ enum MigrationPlan: SchemaMigrationPlan {
         fromVersion: SchemaV3.self,
         toVersion: SchemaV4.self
     )
+
+    // Migration from V4 to V5: drop the unique constraint on WordProgress.word and
+    // add property defaults so the store can mirror to CloudKit.
+    static let migrateV4toV5 = MigrationStage.lightweight(
+        fromVersion: SchemaV4.self,
+        toVersion: SchemaV5.self
+    )
 }
 
 @main
@@ -141,6 +181,13 @@ struct GRE_VerbalApp: App {
         let appSupport = URL.applicationSupportDirectory
         let defaultStore = appSupport.appending(path: Self.storeFileName)
 
+        // If a previous devicectl copy accidentally created "Application Support"
+        // as a FILE instead of a directory, remove it so CoreData can init.
+        var isDir: ObjCBool = false
+        if fileManager.fileExists(atPath: appSupport.path, isDirectory: &isDir), !isDir.boolValue {
+            try? fileManager.removeItem(at: appSupport)
+            print("🧹 Removed stale non-directory at Application Support path")
+        }
         try? fileManager.createDirectory(at: appSupport, withIntermediateDirectories: true)
 
         // If a backup exists but current store is missing, recover automatically.
@@ -178,13 +225,20 @@ struct GRE_VerbalApp: App {
     private static func makeContainer(useMigrationPlan: Bool) throws -> ModelContainer {
         let schema = Schema(
             [WordProgress.self, AppSettings.self, DrillSession.self],
-            version: SchemaV4.versionIdentifier
+            version: SchemaV5.versionIdentifier
         )
+
+        // Explicitly pin the store to the app's OWN Application Support directory.
+        // Without this, SwiftData (when the iCloud entitlement is present) places
+        // the store in the App Group container — a different path from where the
+        // backup JSON lives, causing the restore to silently miss it.
+        let storeURL = URL.applicationSupportDirectory.appending(path: "default.store")
+        try? FileManager.default.createDirectory(
+            at: URL.applicationSupportDirectory, withIntermediateDirectories: true)
 
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true,
+            url: storeURL,
             cloudKitDatabase: .none
         )
 
@@ -326,7 +380,46 @@ struct GRE_VerbalApp: App {
                         NotificationCenter.default.post(name: .openPracticeTab, object: nil)
                     }
                 }
+                #if DEBUG
+                .task { await Self.runCloudKitDiagnostics(modelContainer) }
+                #endif
         }
         .modelContainer(modelContainer)
     }
+
+    #if DEBUG
+    /// TEMPORARY CloudKit persistence harness (remove after verification).
+    /// Driven by env vars passed via `devicectl ... process launch`:
+    ///   SEED_DEBUG_DATA=1  inserts 5 throwaway WordProgress rows ("cktest_*").
+    ///   CKTEST_POLL=1      logs the row count every 5s for 2 min so the
+    ///                      uninstall -> reinstall CloudKit round-trip is visible
+    ///                      in the device console as the count climbs back up.
+    @MainActor
+    static func runCloudKitDiagnostics(_ container: ModelContainer) async {
+        let context = container.mainContext
+        let env = ProcessInfo.processInfo.environment
+
+        func wpCount() -> Int { (try? context.fetchCount(FetchDescriptor<WordProgress>())) ?? -1 }
+        print("🩺 CKTEST launch counts: WordProgress=\(wpCount()) DrillSession=\((try? context.fetchCount(FetchDescriptor<DrillSession>())) ?? -1)")
+
+        if env["SEED_DEBUG_DATA"] == "1" {
+            for i in 0..<5 {
+                let wp = WordProgress(word: "cktest_\(i)")
+                wp.hasSeenOnce = true
+                wp.wrongCount = i
+                context.insert(wp)
+            }
+            try? context.save()
+            print("🩺 CKTEST seeded 5 rows; WordProgress=\(wpCount())")
+        }
+
+        if env["CKTEST_POLL"] == "1" {
+            for tick in 0..<24 {
+                print("🩺 CKTEST poll[\(tick)]: WordProgress=\(wpCount())")
+                try? await Task.sleep(for: .seconds(5))
+            }
+            print("🩺 CKTEST poll done: WordProgress=\(wpCount())")
+        }
+    }
+    #endif
 }
