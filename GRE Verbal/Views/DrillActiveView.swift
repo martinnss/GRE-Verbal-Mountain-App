@@ -98,7 +98,7 @@ struct DrillActiveView: View {
             Text("\(vm.questionCount) questions · \(minutesLabel) each")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.5))
-            Text("tap current = ✓  ·  tap other = navigate  ·  double-tap = ✗")
+            Text("tap current: 1× = seen  ·  2× = ✓  ·  tap other = navigate")
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.3))
                 .kerning(0.5)
@@ -241,13 +241,8 @@ struct DrillActiveView: View {
             .frame(width: circleSize(count: vm.questionCount), height: circleSize(count: vm.questionCount))
             .scaleEffect(isCurrent ? 1.1 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCurrent)
-            .onTapGesture(count: 2) {
+            .onTapGesture {
                 if vm.started {
-                    vm.longPressQuestion(number)
-                }
-            }
-            .onTapGesture(count: 1) {
-                if state == .pending && vm.started {
                     vm.tapQuestion(number)
                 }
             }
@@ -266,33 +261,37 @@ struct DrillActiveView: View {
 
     private func circleFill(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? currentQuestionAccent.opacity(0.18) : Color.white.opacity(0.05)
-        case .correct: return Color.green.opacity(0.25)
-        case .wrong:   return Color.red.opacity(0.25)
+        case .pending:  return isCurrent ? currentQuestionAccent.opacity(0.18) : Color.white.opacity(0.05)
+        case .answered: return Color.gray.opacity(0.22)
+        case .correct:  return Color.green.opacity(0.25)
+        case .wrong:    return Color.red.opacity(0.25)
         }
     }
 
     private func circleBorder(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? currentQuestionAccent : .white.opacity(0.25)
-        case .correct: return .green.opacity(0.7)
-        case .wrong:   return .red.opacity(0.7)
+        case .pending:  return isCurrent ? currentQuestionAccent : .white.opacity(0.25)
+        case .answered: return .gray.opacity(0.65)
+        case .correct:  return .green.opacity(0.7)
+        case .wrong:    return .red.opacity(0.7)
         }
     }
 
     private func circleShadow(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? currentQuestionAccent.opacity(0.45) : .clear
-        case .correct: return .green.opacity(0.3)
-        case .wrong:   return .red.opacity(0.3)
+        case .pending:  return isCurrent ? currentQuestionAccent.opacity(0.45) : .clear
+        case .answered: return .gray.opacity(0.25)
+        case .correct:  return .green.opacity(0.3)
+        case .wrong:    return .red.opacity(0.3)
         }
     }
 
     private func circleTextColor(state: QuestionState, isCurrent: Bool) -> Color {
         switch state {
-        case .pending: return isCurrent ? currentQuestionAccent : .white.opacity(0.7)
-        case .correct: return .green
-        case .wrong:   return .red
+        case .pending:  return isCurrent ? currentQuestionAccent : .white.opacity(0.7)
+        case .answered: return .gray
+        case .correct:  return .green
+        case .wrong:    return .red
         }
     }
 
