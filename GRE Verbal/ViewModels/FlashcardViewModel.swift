@@ -81,6 +81,8 @@ final class FlashcardViewModel {
         knownCount = 0
         unknownCount = 0
         isCardFlipped = false
+        cardOffset = .zero
+        cardRotation = 0
         showingSessionComplete = false   // clear last session's completion overlay
         sessionStartTime = Date()
         
